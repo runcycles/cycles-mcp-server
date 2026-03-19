@@ -192,6 +192,27 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 
 ---
 
+## CI / CD Pipeline
+
+| Job | Trigger | Steps |
+|-----|---------|-------|
+| `test` | Push to main/master, PRs, manual dispatch | typecheck → lint → build → test:coverage (Node 20, 22 matrix) |
+| `publish` (npm) | `v*` tag push | build → `npm publish --provenance --access public` |
+| `publish-registry` (MCP Registry) | `v*` tag push (after npm) | `mcp-registry-cli publish .mcp/server.json` |
+
+**ESLint:** Flat config (`eslint.config.js`) with `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`. Lints `src/**/*.ts`.
+
+## Publishing
+
+| Target | Identifier | Status |
+|--------|-----------|--------|
+| npm | `@runcycles/mcp-server` | Ready — CI publishes on `v*` tag |
+| MCP Registry | `io.github.runcycles/cycles-mcp-server` | Ready — `.mcp/server.json` manifest with title, categories, keywords |
+
+npm package includes: `dist/`, `docs/`, `.mcp/`, `LICENSE`, `README.md`.
+
+---
+
 ## Verdict
 
-The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.23 OpenAPI spec. All 9 tools map 1:1 to protocol endpoints. Zod input schemas enforce the same constraints as the spec (required fields, enum values, numeric bounds). Tool outputs match spec response schemas via `runcycles` wire-format mappers. Auth, idempotency, and subject validation are correctly delegated to or validated against the spec. Mock responses are structurally identical to real protocol responses. No open issues.
+The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.23 OpenAPI spec. All 9 tools map 1:1 to protocol endpoints. Zod input schemas enforce the same constraints as the spec (required fields, enum values, numeric bounds). Tool outputs match spec response schemas via `runcycles` wire-format mappers. Auth, idempotency, and subject validation are correctly delegated to or validated against the spec. Mock responses are structurally identical to real protocol responses. CI pipeline validates all quality gates (typecheck, lint, build, 157 tests with coverage thresholds). No open issues.

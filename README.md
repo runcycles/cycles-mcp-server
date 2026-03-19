@@ -182,10 +182,31 @@ npm install
 npm run dev              # stdio transport with tsx
 npm run dev:http         # HTTP transport with tsx
 npm run build            # TypeScript build
+npm run lint             # ESLint
 npm test                 # Run tests
 npm run test:coverage    # Run with coverage (95%+ lines, 85%+ branches)
 npm run typecheck        # Type check without emitting
 ```
+
+## Publishing
+
+The server is published to two registries:
+
+| Registry | Identifier | How |
+|----------|-----------|-----|
+| **npm** | `@runcycles/mcp-server` | CI publishes on `v*` tag push with provenance |
+| **MCP Registry** | `io.github.runcycles/cycles-mcp-server` | CI publishes `.mcp/server.json` manifest after npm |
+
+To release a new version:
+
+```bash
+# 1. Update version in package.json and .mcp/server.json
+# 2. Commit, tag, and push
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+CI runs: test (Node 20+22) → npm publish → MCP Registry publish.
 
 ## Protocol Conformance
 
