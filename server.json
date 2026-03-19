@@ -1,0 +1,29 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.runcycles/cycles-mcp-server",
+  "description": "Reserve, enforce, and reconcile execution budget for autonomous agents. Prevents coding agents from exceeding allowed spend under retries, parallelism, and tool fan-out.",
+  "repository": {
+    "url": "https://github.com/runcycles/cycles-mcp-server",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@runcycles/mcp-server",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "CYCLES_API_KEY",
+          "description": "Cycles API key for authentication (see https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}
