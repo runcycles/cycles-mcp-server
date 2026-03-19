@@ -146,15 +146,17 @@ npx @runcycles/mcp-server --transport http
 Every costly operation follows a reserve → execute → finalize lifecycle:
 
 ```
-1. cycles_check_balance  → Is there enough budget to start?
-2. cycles_decide         → Lightweight preflight: would this be allowed? (no lock)
-3. cycles_reserve        → Lock budget before each costly step
-4. Execute               → Perform the operation (respect any caps from the decision)
-5. cycles_commit         → Record actual usage — releases unused portion back to the pool
-   OR cycles_release     → Cancel the reservation if the step was skipped
+1. cycles_reserve   → Lock budget before each costly step
+2. Execute          → Perform the operation (respecting any caps)
+3. cycles_commit    → Record actual usage — releases unused portion back to the pool
+   OR cycles_release → Cancel the reservation if the step was skipped
 ```
 
-Every reservation **must** be finalized with either `cycles_commit` or `cycles_release` — never leave reservations dangling. For long-running operations, use `cycles_extend` to heartbeat the reservation TTL so it doesn't expire mid-operation.
+Optionally, before reserving:
+- `cycles_check_balance` — inspect remaining budget to plan your approach
+- `cycles_decide` — lightweight preflight check without locking funds
+
+Every reservation **must** be finalized with either `cycles_commit` or `cycles_release` — never leave reservations dangling. For long-running operations, use `cycles_extend` to heartbeat the reservation TTL so it doesn't expire mid-operation. See [integration patterns](docs/patterns.md) for detailed examples.
 
 ## Resources
 

@@ -5,12 +5,15 @@
 Every agent step should follow this pattern:
 
 ```
-1. cycles_decide    → Is there enough budget to start?
-2. cycles_reserve   → Claim budget before each step
-3. Execute          → Perform the operation (respecting any caps)
-4. cycles_commit    → Reconcile actual usage after each step
-5. cycles_release   → Clean release if step was skipped/cancelled
+1. cycles_reserve   → Lock budget before each costly step
+2. Execute          → Perform the operation (respecting any caps)
+3. cycles_commit    → Record actual usage after each step
+   OR cycles_release → Clean release if step was skipped/cancelled
 ```
+
+Optionally, before reserving:
+- `cycles_check_balance` — inspect remaining budget to plan your approach (see Pattern 6)
+- `cycles_decide` — lightweight preflight check without locking funds (see Pattern 2)
 
 ## Pattern 1: Simple Reserve/Commit
 
