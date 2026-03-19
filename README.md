@@ -5,7 +5,7 @@
 
 # Cycles MCP Server
 
-MCP server for [Cycles](https://runcycles.com) — runtime budget authority for autonomous agents.
+MCP server for [Cycles](https://runcycles.io) — runtime budget authority for autonomous agents.
 
 ## Why use this?
 
@@ -117,12 +117,12 @@ env: { CYCLES_API_KEY: "your-key" }
 
 ```bash
 export CYCLES_API_KEY=your-api-key-here       # required (unless CYCLES_MOCK=true)
-export CYCLES_BASE_URL=https://api.runcycles.com  # optional
+export CYCLES_BASE_URL=https://api.runcycles.io  # optional
 export CYCLES_MOCK=true                        # optional, enables mock mode
 export PORT=3000                               # optional, for HTTP transport
 ```
 
-**Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.com/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
+**Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
 
 ```bash
 curl -s -X POST http://localhost:7979/v1/admin/api-keys \
@@ -131,7 +131,7 @@ curl -s -X POST http://localhost:7979/v1/admin/api-keys \
   -d '{"tenant_id":"acme-corp","name":"dev-key","permissions":["reservations:create","reservations:commit","reservations:release","reservations:extend","reservations:list","balances:read","decide","events:create"]}' | jq -r '.key_secret'
 ```
 
-The key (e.g. `cyc_live_abc123...`) is shown only once — save it immediately. For key rotation and lifecycle details, see [API Key Management](https://runcycles.com/how-to/api-key-management-in-cycles).
+The key (e.g. `cyc_live_abc123...`) is shown only once — save it immediately. For key rotation and lifecycle details, see [API Key Management](https://runcycles.io/how-to/api-key-management-in-cycles).
 
 ## Running
 
