@@ -8,10 +8,70 @@ MCP server for [Cycles](https://runcycles.com) — runtime budget authority for 
 npm install @runcycles/mcp-server
 ```
 
+## Setup
+
+### Claude Desktop
+
+Add to your `claude_desktop_config.json`:
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "cycles": {
+      "command": "npx",
+      "args": ["-y", "@runcycles/mcp-server"],
+      "env": {
+        "CYCLES_API_KEY": "your-api-key-here"
+      }
+    }
+  }
+}
+```
+
+For local development without an API key, use mock mode:
+
+```json
+{
+  "mcpServers": {
+    "cycles": {
+      "command": "npx",
+      "args": ["-y", "@runcycles/mcp-server"],
+      "env": {
+        "CYCLES_MOCK": "true"
+      }
+    }
+  }
+}
+```
+
+### Claude Code
+
+```bash
+claude mcp add cycles -- npx -y @runcycles/mcp-server
+```
+
+Set your API key:
+
+```bash
+export CYCLES_API_KEY=your-api-key-here
+```
+
+### Cursor / Windsurf / Other MCP Hosts
+
+Use stdio transport with:
+
+```
+command: npx
+args: ["-y", "@runcycles/mcp-server"]
+env: { CYCLES_API_KEY: "your-key" }
+```
+
 ## Configuration
 
 ```bash
-export CYCLES_API_KEY=your-api-key-here       # required
+export CYCLES_API_KEY=your-api-key-here       # required (unless CYCLES_MOCK=true)
 export CYCLES_BASE_URL=https://api.runcycles.com  # optional
 export CYCLES_MOCK=true                        # optional, enables mock mode
 export PORT=3000                               # optional, for HTTP transport

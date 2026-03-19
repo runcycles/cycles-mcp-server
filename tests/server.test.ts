@@ -51,4 +51,10 @@ describe("createServer", () => {
     expect(names).toContain("diagnose_overrun");
     expect(names).toContain("design_budget_strategy");
   });
+
+  it("close() shuts down cleanly", async () => {
+    const adapter = new MockClientAdapter();
+    const server = createServer(adapter);
+    await expect(server.close()).resolves.not.toThrow();
+  });
 });
