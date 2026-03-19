@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.runcycles/cycles-mcp-server",
-  "description": "Reserve, enforce, and reconcile execution budget for autonomous agents. Prevents coding agents from exceeding allowed spend under retries, parallelism, and tool fan-out.",
+  "description": "Runtime budget authority for autonomous agents — reserve, enforce, and reconcile spend",
   "repository": {
     "url": "https://github.com/runcycles/cycles-mcp-server",
     "source": "github"
