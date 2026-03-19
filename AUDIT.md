@@ -161,7 +161,7 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 
 ### Test Coverage (correct)
 
-- 156 tests across 8 test files
+- 157 tests across 8 test files
 - Line coverage: 97.30% (threshold: 95%)
 - Branch coverage: 94.87% (threshold: 85%)
 - All tool handlers tested: happy path, error paths, edge cases

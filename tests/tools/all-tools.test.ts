@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { MockClientAdapter, CyclesApiError } from "../../src/client-adapter.js";
 import { registerAllTools } from "../../src/tools/index.js";
@@ -17,6 +17,10 @@ beforeEach(() => {
   server = new McpServer({ name: "test", version: "0.0.1" });
   adapter = new MockClientAdapter();
   registerAllTools(server, adapter);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 describe("cycles_reserve", () => {
