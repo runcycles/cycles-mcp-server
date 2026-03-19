@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.runcycles/cycles-mcp-server",
+  "title": "Cycles — Runtime Budget Authority",
+  "description": "Reserve, enforce, and reconcile execution budget for autonomous agents. Prevents coding agents from exceeding allowed spend under retries, parallelism, and tool fan-out.",
+  "version": "0.1.0",
+  "websiteUrl": "https://runcycles.com",
+  "categories": ["infrastructure", "agents", "finance"],
+  "keywords": [
+    "budget",
+    "spend control",
+    "token limits",
+    "agent guardrails",
+    "runtime enforcement",
+    "LLM cost",
+    "agentic workflows"
+  ],
+  "packages": [
+    {
+      "registry_type": "npm",
+      "identifier": "@runcycles/mcp-server",
+      "version": "0.1.0"
+    }
+  ]
+}
