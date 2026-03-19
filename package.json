@@ -1,6 +1,7 @@
 {
   "name": "@runcycles/mcp-server",
   "version": "0.1.0",
+  "mcpName": "io.github.runcycles/cycles-mcp-server",
   "description": "MCP server for Cycles — runtime budget authority for autonomous agents",
   "license": "Apache-2.0",
   "author": "runcycles",
@@ -34,7 +35,7 @@
   "files": [
     "dist",
     "docs",
-    ".mcp",
+    "server.json",
     "LICENSE",
     "README.md"
   ],
