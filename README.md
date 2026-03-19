@@ -1,6 +1,11 @@
+[![npm](https://img.shields.io/npm/v/@runcycles/mcp-server)](https://www.npmjs.com/package/@runcycles/mcp-server)
+[![CI](https://github.com/runcycles/cycles-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/runcycles/cycles-mcp-server/actions)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
+
 # Cycles MCP Server
 
-MCP server for [Cycles](https://runcycles.com) — runtime budget authority for autonomous agents.
+MCP server for [Cycles](https://runcycles.io) — runtime budget authority for autonomous agents.
 
 ## Why use this?
 
@@ -112,7 +117,7 @@ env: { CYCLES_API_KEY: "your-key" }
 
 ```bash
 export CYCLES_API_KEY=your-api-key-here       # required (unless CYCLES_MOCK=true)
-export CYCLES_BASE_URL=https://api.runcycles.com  # optional
+export CYCLES_BASE_URL=https://api.runcycles.io  # optional
 export CYCLES_MOCK=true                        # optional, enables mock mode
 export PORT=3000                               # optional, for HTTP transport
 ```

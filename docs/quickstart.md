@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Node.js 20+
-- A Cycles API key (get one at https://runcycles.com)
+- A Cycles API key (get one at https://runcycles.io)
 
 ## Installation
 
@@ -17,7 +17,7 @@ Set your environment variables:
 
 ```bash
 export CYCLES_API_KEY=your-api-key-here
-export CYCLES_BASE_URL=https://api.runcycles.com  # optional
+export CYCLES_BASE_URL=https://api.runcycles.io  # optional
 ```
 
 For local development with mock responses:
