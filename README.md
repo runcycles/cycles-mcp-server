@@ -72,7 +72,7 @@ npx @runcycles/mcp-server --transport http
 
 ```bash
 npm install
-npm run dev              # stdio transport with tsx watch
+npm run dev              # stdio transport with tsx
 npm run dev:http         # HTTP transport with tsx
 npm run build            # TypeScript build
 npm test                 # Run tests
