@@ -4,7 +4,7 @@ import { registerAllTools } from "./tools/index.js";
 import { registerAllResources } from "./resources/index.js";
 import { registerAllPrompts } from "./prompts/index.js";
 
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 export function createServer(adapter: ClientAdapter): McpServer {
   const server = new McpServer(
