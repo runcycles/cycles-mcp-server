@@ -2,6 +2,24 @@
 
 MCP server for [Cycles](https://runcycles.com) — runtime budget authority for autonomous agents.
 
+## Why use this?
+
+Autonomous AI agents (Claude, GPT, custom agents) call LLMs, invoke tools, and hit external APIs — but have no built-in way to cap how much they spend. A single agent loop can burn through hundreds of dollars before anyone notices. Multiply that across tenants and teams, and cost control becomes a real problem.
+
+This MCP server gives any MCP-compatible agent a **runtime budget authority**: a set of tools to check, reserve, spend, and release budget before and after every costly operation. The agent asks "can I afford this?" before acting, and reports what it actually used afterward.
+
+**Who needs this:**
+
+- **Platform teams** building multi-tenant agent systems that need per-customer or per-workspace spend limits
+- **Agent developers** who want agents to self-regulate — degrade to cheaper models when budget is low, skip optional tool calls, reduce retries
+- **Enterprises** deploying AI agents that need guardrails so a runaway agent can't blow through a budget
+
+**Why MCP specifically:**
+
+MCP is the standard protocol that AI hosts (Claude Desktop, Claude Code, Cursor, Windsurf, custom agents) use to discover and call tools. By exposing Cycles as an MCP server, any MCP-compatible agent gets budget awareness as a plug-in — just add the server to your config. No SDK integration in the agent's own code required.
+
+The server also ships built-in [prompts](#prompts) so an AI assistant can help you design your budget strategy, generate integration code, and diagnose budget overruns — not just enforce budgets at runtime.
+
 ## Installation
 
 ```bash
@@ -103,13 +121,18 @@ npx @runcycles/mcp-server --transport http
 
 ## Agent Decision Loop
 
+Every costly operation follows a reserve → execute → finalize lifecycle:
+
 ```
 1. cycles_check_balance  → Is there enough budget to start?
-2. cycles_reserve        → Claim budget before each step
-3. Execute               → Perform the operation (respect any caps)
-4. cycles_commit         → Reconcile actual usage after each step
-5. cycles_release        → Clean release if step was skipped/cancelled
+2. cycles_decide         → Lightweight preflight: would this be allowed? (no lock)
+3. cycles_reserve        → Lock budget before each costly step
+4. Execute               → Perform the operation (respect any caps from the decision)
+5. cycles_commit         → Record actual usage — releases unused portion back to the pool
+   OR cycles_release     → Cancel the reservation if the step was skipped
 ```
+
+Every reservation **must** be finalized with either `cycles_commit` or `cycles_release` — never leave reservations dangling. For long-running operations, use `cycles_extend` to heartbeat the reservation TTL so it doesn't expire mid-operation.
 
 ## Resources
 
