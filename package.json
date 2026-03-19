@@ -8,6 +8,23 @@
     "type": "git",
     "url": "https://github.com/runcycles/cycles-mcp-server.git"
   },
+  "homepage": "https://github.com/runcycles/cycles-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/runcycles/cycles-mcp-server/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "cycles",
+    "budget",
+    "ai",
+    "llm",
+    "agent",
+    "cost-control",
+    "metering",
+    "runcycles"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -17,6 +34,7 @@
   "files": [
     "dist",
     "docs",
+    ".mcp",
     "LICENSE",
     "README.md"
   ],

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
+  "name": "io.github.runcycles/cycles-mcp-server",
+  "description": "Runtime budget authority for autonomous agents — reserve, commit, and release budget before and after every costly AI operation",
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registry_type": "npm",
+      "identifier": "@runcycles/mcp-server",
+      "version": "0.1.0"
+    }
+  ]
+}
