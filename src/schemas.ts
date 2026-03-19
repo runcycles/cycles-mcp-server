@@ -36,7 +36,10 @@ export const SubjectObjectSchema = z.object({
   workflow: z.string().max(128).optional(),
   agent: z.string().max(128).optional(),
   toolset: z.string().max(128).optional(),
-  dimensions: z.record(z.string(), z.string().max(256)).optional(),
+  dimensions: z.record(z.string(), z.string().max(256)).refine(
+    (d) => Object.keys(d).length <= 16,
+    { message: "dimensions must have at most 16 entries" },
+  ).optional(),
 });
 
 export const SubjectSchema = SubjectObjectSchema.refine(
@@ -123,7 +126,7 @@ export const CheckBalanceInputSchema = z.object({
 
 export const ListReservationsInputSchema = z.object({
   status: ReservationStatusEnum.optional(),
-  idempotencyKey: z.string().optional(),
+  idempotencyKey: z.string().min(1).max(256).optional(),
   tenant: z.string().optional(),
   workspace: z.string().optional(),
   app: z.string().optional(),

@@ -185,6 +185,22 @@ describe("cycles_decide", () => {
     });
     expect(result.isError).toBe(true);
   });
+
+  it("returns error on adapter failure", async () => {
+    vi.spyOn(adapter, "decide").mockRejectedValue(
+      new CyclesApiError("BUDGET_EXCEEDED", "Over budget", "req-d1", 409),
+    );
+    const handler = getRegisteredToolHandler("cycles_decide");
+    const result = await handler({
+      idempotencyKey: "k3",
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt-4o" },
+      estimate: { unit: "TOKENS", amount: 500 },
+    });
+    expect(result.isError).toBe(true);
+    const body = JSON.parse(result.content[0].text);
+    expect(body.error).toBe("BUDGET_EXCEEDED");
+  });
 });
 
 describe("cycles_check_balance", () => {
@@ -240,6 +256,27 @@ describe("cycles_list_reservations", () => {
       tenant: "t1",
       limit: "25",
     });
+  });
+
+  it("converts idempotencyKey to snake_case query param", async () => {
+    const spy = vi.spyOn(adapter, "listReservations");
+    const handler = getRegisteredToolHandler("cycles_list_reservations");
+    await handler({ idempotencyKey: "key-123", tenant: "t1" });
+    expect(spy).toHaveBeenCalledWith({
+      idempotency_key: "key-123",
+      tenant: "t1",
+    });
+  });
+
+  it("returns error on adapter failure", async () => {
+    vi.spyOn(adapter, "listReservations").mockRejectedValue(
+      new CyclesApiError("INTERNAL_ERROR", "Server error", "req-lr1", 500),
+    );
+    const handler = getRegisteredToolHandler("cycles_list_reservations");
+    const result = await handler({});
+    expect(result.isError).toBe(true);
+    const body = JSON.parse(result.content[0].text);
+    expect(body.error).toBe("INTERNAL_ERROR");
   });
 });
 

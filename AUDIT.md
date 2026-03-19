@@ -161,12 +161,34 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 
 ### Test Coverage (correct)
 
-- 148 tests across 8 test files
-- Line coverage: 96.88% (threshold: 95%)
-- Branch coverage: 94.73% (threshold: 85%)
+- 156 tests across 8 test files
+- Line coverage: 97.30% (threshold: 95%)
+- Branch coverage: 94.87% (threshold: 85%)
 - All tool handlers tested: happy path, error paths, edge cases
 - Mock responses validated for structural match to protocol types
 - Client adapter tested for both real (mocked fetch) and mock implementations
+
+---
+
+## Previously Found Issues (all fixed)
+
+### 1. `cycles_list_reservations` — idempotencyKey query param sent in camelCase
+
+**Before:** The tool mapped `idempotencyKey` directly as a camelCase query parameter, but the Cycles API expects `idempotency_key` (snake_case) in query strings.
+
+**Fix:** Explicitly convert `params.idempotencyKey` to `queryParams.idempotency_key` in `src/tools/cycles-list-reservations.ts`, matching the pattern already used for `includeChildren` → `include_children` in `cycles-check-balance.ts`.
+
+### 2. `ListReservationsInputSchema.idempotencyKey` — missing length constraints
+
+**Before:** `idempotencyKey: z.string().optional()` — no length validation.
+
+**Fix:** Changed to `z.string().min(1).max(256).optional()` to match the spec's `IdempotencyKey` schema (minLength: 1, maxLength: 256).
+
+### 3. `SubjectObjectSchema.dimensions` — missing maxProperties constraint
+
+**Before:** `dimensions: z.record(z.string(), z.string().max(256)).optional()` — no limit on number of entries.
+
+**Fix:** Added `.refine((d) => Object.keys(d).length <= 16, ...)` to enforce the spec's `maxProperties: 16` constraint on custom dimensions.
 
 ---
 

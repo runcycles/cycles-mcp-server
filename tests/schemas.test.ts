@@ -102,6 +102,22 @@ describe("SubjectObjectSchema (without refine)", () => {
       SubjectObjectSchema.parse({ tenant: "a".repeat(129) }),
     ).toThrow();
   });
+
+  it("accepts dimensions with up to 16 entries", () => {
+    const dims: Record<string, string> = {};
+    for (let i = 0; i < 16; i++) dims[`key${i}`] = `val${i}`;
+    expect(SubjectObjectSchema.parse({ tenant: "t1", dimensions: dims })).toMatchObject({
+      tenant: "t1",
+    });
+  });
+
+  it("rejects dimensions with more than 16 entries", () => {
+    const dims: Record<string, string> = {};
+    for (let i = 0; i < 17; i++) dims[`key${i}`] = `val${i}`;
+    expect(() =>
+      SubjectObjectSchema.parse({ tenant: "t1", dimensions: dims }),
+    ).toThrow();
+  });
 });
 
 describe("ActionSchema", () => {
@@ -391,6 +407,24 @@ describe("ListReservationsInputSchema", () => {
   it("rejects invalid status", () => {
     expect(() =>
       ListReservationsInputSchema.parse({ status: "PENDING" }),
+    ).toThrow();
+  });
+
+  it("accepts idempotencyKey with valid length", () => {
+    expect(
+      ListReservationsInputSchema.parse({ idempotencyKey: "key-123" }),
+    ).toMatchObject({ idempotencyKey: "key-123" });
+  });
+
+  it("rejects empty idempotencyKey", () => {
+    expect(() =>
+      ListReservationsInputSchema.parse({ idempotencyKey: "" }),
+    ).toThrow();
+  });
+
+  it("rejects idempotencyKey over 256 chars", () => {
+    expect(() =>
+      ListReservationsInputSchema.parse({ idempotencyKey: "a".repeat(257) }),
     ).toThrow();
   });
 });

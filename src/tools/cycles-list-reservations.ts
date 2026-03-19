@@ -16,7 +16,6 @@ export function registerListReservationsTool(
         const queryParams: Record<string, string> = {};
         for (const key of [
           "status",
-          "idempotencyKey",
           "tenant",
           "workspace",
           "app",
@@ -27,6 +26,8 @@ export function registerListReservationsTool(
         ] as const) {
           if (params[key]) queryParams[key] = params[key];
         }
+        if (params.idempotencyKey)
+          queryParams.idempotency_key = params.idempotencyKey;
         if (params.limit !== undefined)
           queryParams.limit = String(params.limit);
 
