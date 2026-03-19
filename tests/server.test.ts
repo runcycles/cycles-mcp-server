@@ -11,7 +11,7 @@ describe("createServer", () => {
   });
 
   it("VERSION is set", () => {
-    expect(VERSION).toBe("0.1.0");
+    expect(VERSION).toBe("0.1.1");
   });
 
   it("has all 9 tools registered", () => {

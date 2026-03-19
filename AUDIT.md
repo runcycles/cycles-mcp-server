@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-19
 **Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.23)
-**MCP Server:** `@runcycles/mcp-server` v0.1.0 (Node 20+ / @modelcontextprotocol/sdk / TypeScript 5)
+**MCP Server:** `@runcycles/mcp-server` v0.1.1 (Node 20+ / @modelcontextprotocol/sdk / TypeScript 5)
 **Client dependency:** `runcycles` v0.1.1 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
 
 ---
