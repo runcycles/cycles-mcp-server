@@ -1,3 +1,8 @@
+[![npm](https://img.shields.io/npm/v/@runcycles/mcp-server)](https://www.npmjs.com/package/@runcycles/mcp-server)
+[![CI](https://github.com/runcycles/cycles-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/runcycles/cycles-mcp-server/actions)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
+[![MCP](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
+
 # Cycles MCP Server
 
 MCP server for [Cycles](https://runcycles.com) — runtime budget authority for autonomous agents.
@@ -117,7 +122,7 @@ export CYCLES_MOCK=true                        # optional, enables mock mode
 export PORT=3000                               # optional, for HTTP transport
 ```
 
-**Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
+**Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.com/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
 
 ```bash
 curl -s -X POST http://localhost:7979/v1/admin/api-keys \
@@ -126,7 +131,7 @@ curl -s -X POST http://localhost:7979/v1/admin/api-keys \
   -d '{"tenant_id":"acme-corp","name":"dev-key","permissions":["reservations:create","reservations:commit","reservations:release","reservations:extend","reservations:list","balances:read","decide","events:create"]}' | jq -r '.key_secret'
 ```
 
-The key (e.g. `cyc_live_abc123...`) is shown only once — save it immediately. For key rotation and lifecycle details, see [API Key Management](https://runcycles.io/how-to/api-key-management-in-cycles).
+The key (e.g. `cyc_live_abc123...`) is shown only once — save it immediately. For key rotation and lifecycle details, see [API Key Management](https://runcycles.com/how-to/api-key-management-in-cycles).
 
 ## Running
 
