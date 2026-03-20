@@ -224,6 +224,12 @@ git push origin v0.1.0
 
 CI runs: test (Node 20+22) → npm publish → MCP Registry publish.
 
+## Documentation
+
+- [Cycles Documentation](https://runcycles.io) — full docs site
+- [MCP Server Quickstart](https://runcycles.io/quickstart/getting-started-with-the-mcp-server) — getting started guide
+- [Integrating Cycles with MCP](https://runcycles.io/how-to/integrating-cycles-with-mcp) — detailed MCP integration guide
+
 ## Protocol Conformance
 
 This MCP server is audited against the Cycles Protocol v0.1.23 OpenAPI spec. See [AUDIT.md](AUDIT.md) for the full conformance report.
