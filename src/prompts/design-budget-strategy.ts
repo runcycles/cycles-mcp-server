@@ -47,9 +47,9 @@ Recommend per-scope budget allocations with rationale.
 - Whether to use cycles_extend heartbeats for long operations.
 
 ## 5. Overage Policy
-Choose per scope: REJECT, ALLOW_IF_AVAILABLE, or ALLOW_WITH_OVERDRAFT.
+Choose per scope: REJECT, ALLOW_IF_AVAILABLE (default), or ALLOW_WITH_OVERDRAFT.
 - REJECT: strictest — must pre-estimate accurately.
-- ALLOW_IF_AVAILABLE: allows overage if budget exists.
+- ALLOW_IF_AVAILABLE (default): allows overage if budget exists.
 - ALLOW_WITH_OVERDRAFT: allows overage up to overdraft_limit, creating debt.
 
 ## 6. Degradation Strategy
