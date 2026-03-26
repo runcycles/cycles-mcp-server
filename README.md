@@ -68,6 +68,7 @@ Add to your `claude_desktop_config.json`:
       "command": "npx",
       "args": ["-y", "@runcycles/mcp-server"],
       "env": {
+        "CYCLES_BASE_URL": "http://localhost:7878",
         "CYCLES_API_KEY": "your-api-key-here"
       }
     }
@@ -97,9 +98,10 @@ For local development without an API key, use mock mode:
 claude mcp add cycles -- npx -y @runcycles/mcp-server
 ```
 
-Set your API key:
+Set your environment variables:
 
 ```bash
+export CYCLES_BASE_URL=http://localhost:7878
 export CYCLES_API_KEY=your-api-key-here
 ```
 
@@ -110,14 +112,14 @@ Use stdio transport with:
 ```
 command: npx
 args: ["-y", "@runcycles/mcp-server"]
-env: { CYCLES_API_KEY: "your-key" }
+env: { CYCLES_API_KEY: "your-key", CYCLES_BASE_URL: "http://localhost:7878" }
 ```
 
 ## Configuration
 
 ```bash
 export CYCLES_API_KEY=your-api-key-here       # required (unless CYCLES_MOCK=true)
-export CYCLES_BASE_URL=https://api.runcycles.io  # optional
+export CYCLES_BASE_URL=http://localhost:7878   # required — your Cycles server URL
 export CYCLES_MOCK=true                        # optional, enables mock mode
 export PORT=3000                               # optional, for HTTP transport
 ```
