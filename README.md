@@ -1,4 +1,5 @@
 [![npm](https://img.shields.io/npm/v/@runcycles/mcp-server)](https://www.npmjs.com/package/@runcycles/mcp-server)
+[![npm Downloads](https://img.shields.io/npm/dm/@runcycles/mcp-server)](https://www.npmjs.com/package/@runcycles/mcp-server)
 [![CI](https://github.com/runcycles/cycles-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/runcycles/cycles-mcp-server/actions)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
