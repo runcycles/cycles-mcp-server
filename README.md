@@ -137,6 +137,8 @@ curl -s -X POST http://localhost:7979/v1/admin/api-keys \
 
 The key (e.g. `cyc_live_abc123...`) is shown only once — save it immediately. For key rotation and lifecycle details, see [API Key Management](https://runcycles.io/how-to/api-key-management-in-cycles).
 
+> **Individual vs. team use:** For individual use or evaluation, set `CYCLES_MOCK=true` — no server or API key required. If you're deploying agents for multiple users or workspaces, see the [multi-tenant setup guide](https://runcycles.io/how-to/understanding-tenants-scopes-and-budgets-in-cycles).
+
 ## Running
 
 ```bash
