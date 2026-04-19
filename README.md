@@ -4,6 +4,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue)](LICENSE)
 [![MCP](https://img.shields.io/badge/MCP-compatible-green)](https://modelcontextprotocol.io)
 [![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/runcycles/cycles-mcp-server/actions)
+[![SafeSkill 97/100](https://img.shields.io/badge/SafeSkill-97%2F100_Verified%20Safe-brightgreen)](https://safeskill.dev/scan/runcycles-cycles-mcp-server)
 
 # Cycles MCP Server
 
