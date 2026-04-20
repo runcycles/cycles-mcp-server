@@ -2,18 +2,18 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.runcycles/cycles-mcp-server",
   "title": "Cycles — Budget Authority for AI Agents",
-  "description": "Runtime budget authority for autonomous agents — reserve, enforce, and reconcile spend across providers",
+  "description": "Runtime budget authority for AI agents — reserve, enforce, reconcile spend across providers",
   "websiteUrl": "https://runcycles.io",
   "repository": {
     "url": "https://github.com/runcycles/cycles-mcp-server",
     "source": "github"
   },
-  "version": "0.2.1",
+  "version": "0.2.2",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@runcycles/mcp-server",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "transport": {
         "type": "stdio"
       },
