@@ -1,27 +1,41 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.runcycles/cycles-mcp-server",
-  "description": "Runtime budget authority for autonomous agents — reserve, enforce, and reconcile spend",
+  "title": "Cycles — Budget Authority for AI Agents",
+  "description": "Runtime budget authority for autonomous agents — reserve, enforce, and reconcile spend across providers",
+  "websiteUrl": "https://runcycles.io",
   "repository": {
     "url": "https://github.com/runcycles/cycles-mcp-server",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "0.2.1",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@runcycles/mcp-server",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "transport": {
         "type": "stdio"
       },
       "environmentVariables": [
         {
           "name": "CYCLES_API_KEY",
-          "description": "Cycles API key for authentication (see https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key)",
+          "description": "Cycles API key for authentication. Set CYCLES_MOCK=true for local development without a key.",
           "isRequired": true,
-          "format": "string",
           "isSecret": true
+        },
+        {
+          "name": "CYCLES_BASE_URL",
+          "description": "URL of the Cycles server.",
+          "default": "https://api.runcycles.io",
+          "isRequired": false
+        },
+        {
+          "name": "CYCLES_MOCK",
+          "description": "Enable mock mode for local development — no API key or live server required.",
+          "default": "false",
+          "choices": ["true", "false"],
+          "isRequired": false
         }
       ]
     }
