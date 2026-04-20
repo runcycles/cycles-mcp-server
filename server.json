@@ -20,8 +20,8 @@
       "environmentVariables": [
         {
           "name": "CYCLES_API_KEY",
-          "description": "Cycles API key for authentication. Required for production use; not needed when CYCLES_MOCK=true.",
-          "isRequired": false,
+          "description": "Cycles API key for authentication. Set CYCLES_MOCK=true for local development without a key.",
+          "isRequired": true,
           "isSecret": true
         },
         {
