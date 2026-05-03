@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.4] - 2026-05-03
+
+### Changed
+
+- Add `runtimeHint: "npx"` to `server.json` package metadata so MCP discovery catalogs (e.g. MatrixHub) can enable our entry. Earlier ingests had been disabled with reason "Missing required package metadata (runtimeHint or identifier)".
+
+### Notes
+
+- Version 0.2.3 was published to the MCP Registry only (manually, with package version still pinned to npm 0.2.2) while diagnosing the runtimeHint issue. Skipping 0.2.3 on npm and resyncing both surfaces at 0.2.4 keeps versions aligned across npm and the MCP Registry. No code changes vs 0.2.2 — metadata-only release.
+
 ## [0.2.2] - 2026-04-20
 
 ### Changed
