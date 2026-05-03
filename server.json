@@ -14,6 +14,7 @@
       "registryType": "npm",
       "identifier": "@runcycles/mcp-server",
       "version": "0.2.2",
+      "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
       },
