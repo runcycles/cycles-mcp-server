@@ -56,3 +56,41 @@ jobs:
         run: ./mcp-publisher login github-oidc
       - name: Publish server to MCP Registry
         run: ./mcp-publisher publish
+
+  github-release:
+    name: Create GitHub Release
+    needs: publish-registry
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+      - name: Create release with notes from CHANGELOG
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF#refs/tags/v}"
+
+          # Skip cleanly if a release already exists (e.g. cut by hand earlier).
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists — skipping."
+            exit 0
+          fi
+
+          # Extract just the [VERSION] section of CHANGELOG.md (between
+          # "## [VERSION]" and the next "## [...]"). Stops on next heading
+          # or EOF, so it works for the most-recent entry too.
+          NOTES=$(awk -v ver="$VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md)
+
+          if [ -z "$(echo "$NOTES" | tr -d "[:space:]")" ]; then
+            echo "No CHANGELOG entry for v$VERSION — falling back to auto-generated notes."
+            gh release create "v$VERSION" --title "v$VERSION" --generate-notes
+          else
+            gh release create "v$VERSION" --title "v$VERSION" --notes "$NOTES"
+          fi
