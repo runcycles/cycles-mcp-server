@@ -8,12 +8,12 @@
     "url": "https://github.com/runcycles/cycles-mcp-server",
     "source": "github"
   },
-  "version": "0.2.3",
+  "version": "0.2.4",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@runcycles/mcp-server",
-      "version": "0.2.2",
+      "version": "0.2.4",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
