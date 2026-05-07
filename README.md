@@ -6,9 +6,9 @@
 [![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen)](https://github.com/runcycles/cycles-mcp-server/actions)
 [![SafeSkill 97/100](https://img.shields.io/badge/SafeSkill-97%2F100_Verified%20Safe-brightgreen)](https://safeskill.dev/scan/runcycles-cycles-mcp-server)
 
-# Cycles MCP Server
+# Cycles MCP Server — AI agent runtime control over Model Context Protocol
 
-MCP server for [Cycles](https://runcycles.io) — runtime budget authority for autonomous agents.
+**MCP server that gives any MCP-compatible AI agent (Claude Code, Cursor, Windsurf, custom agents) runtime budget, action, and audit authority — enforce LLM cost limits, tool call caps, action permissions, and audit trails before execution, with zero agent code changes.** Connect via MCP and use the budget tools (`cycles_reserve`, `cycles_commit`, `cycles_release`, `cycles_decide`) directly from the agent's tool-calling loop. Powered by [Cycles](https://runcycles.io).
 
 ## Why use this?
 
