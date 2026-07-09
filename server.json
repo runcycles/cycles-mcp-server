@@ -27,7 +27,7 @@
         },
         {
           "name": "CYCLES_BASE_URL",
-          "description": "URL of the Cycles server (e.g. https://api.runcycles.io). The server fails to start if unset.",
+          "description": "URL of the Cycles server (e.g. https://api.runcycles.io). Required unless CYCLES_MOCK=true.",
           "isRequired": true
         },
         {

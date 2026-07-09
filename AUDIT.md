@@ -198,7 +198,7 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 |-----|---------|-------|
 | `test` | Push to main/master, PRs, manual dispatch | typecheck → lint → build → test:coverage (Node 20, 22 matrix) |
 | `publish` (npm) | `v*` tag push | build → `npm publish --provenance --access public` |
-| `publish-registry` (MCP Registry) | `v*` tag push (after npm) | `mcp-registry-cli publish .mcp/server.json` |
+| `publish-registry` (MCP Registry) | `v*` tag push (after npm) | `./mcp-publisher publish` (root `server.json`) |
 
 **ESLint:** Flat config (`eslint.config.js`) with `@typescript-eslint/eslint-plugin` and `@typescript-eslint/parser`. Lints `src/**/*.ts`.
 
@@ -207,9 +207,9 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 | Target | Identifier | Status |
 |--------|-----------|--------|
 | npm | `@runcycles/mcp-server` | Ready — CI publishes on `v*` tag |
-| MCP Registry | `io.github.runcycles/cycles-mcp-server` | Ready — `.mcp/server.json` manifest with title, categories, keywords |
+| MCP Registry | `io.github.runcycles/cycles-mcp-server` | Ready — root `server.json` manifest with title, categories, keywords |
 
-npm package includes: `dist/`, `docs/`, `.mcp/`, `LICENSE`, `README.md`.
+npm package includes: `dist/`, `docs/`, `server.json`, `LICENSE`, `README.md`.
 
 ---
 

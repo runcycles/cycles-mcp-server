@@ -218,12 +218,12 @@ The server is published to two registries:
 | Registry | Identifier | How |
 |----------|-----------|-----|
 | **npm** | `@runcycles/mcp-server` | CI publishes on `v*` tag push with provenance |
-| **MCP Registry** | `io.github.runcycles/cycles-mcp-server` | CI publishes `.mcp/server.json` manifest after npm |
+| **MCP Registry** | `io.github.runcycles/cycles-mcp-server` | CI publishes the `server.json` manifest after npm |
 
 To release a new version:
 
 ```bash
-# 1. Update version in package.json and .mcp/server.json
+# 1. Update version in package.json and server.json
 # 2. Commit, tag, and push
 git tag v0.1.0
 git push origin v0.1.0
