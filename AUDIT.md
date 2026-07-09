@@ -216,3 +216,13 @@ npm package includes: `dist/`, `docs/`, `.mcp/`, `LICENSE`, `README.md`.
 ## Verdict
 
 The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.23 OpenAPI spec. All 9 tools map 1:1 to protocol endpoints. Zod input schemas enforce the same constraints as the spec (required fields, enum values, numeric bounds). Tool outputs match spec response schemas via `runcycles` wire-format mappers. Auth, idempotency, and subject validation are correctly delegated to or validated against the spec. Mock responses are structurally identical to real protocol responses. CI pipeline validates all quality gates (typecheck, lint, build, 157 tests with coverage thresholds). No open issues.
+
+---
+
+## Registry Metadata Fix — `CYCLES_BASE_URL` Marked Required (2026-07-09)
+
+**Files:** `server.json`, `docs/quickstart.md`, `CHANGELOG.md`. **No code changes** — registry-metadata and docs fix; runtime behavior is unchanged.
+
+**Issue:** `server.json` listed `CYCLES_BASE_URL` as `isRequired: false` with `"default": "https://api.runcycles.io"`, but the runtime has no such fallback. `RealClientAdapter` (`src/client-adapter.ts`) constructs its client via `CyclesConfig.fromEnv()`, which throws `CYCLES_BASE_URL environment variable is required` when the variable is unset — so the server fails to start without it (except in `CYCLES_MOCK=true` mode, which uses `MockClientAdapter` and reads no env config). Users following the registry metadata and omitting the variable would hit a startup crash instead of the advertised default.
+
+**Fix:** `CYCLES_BASE_URL` is now `isRequired: true` and the misleading `default` is removed. The production URL is retained in the `description` as an example value (`"URL of the Cycles server (e.g. https://api.runcycles.io)"`), matching how `CYCLES_API_KEY` documents its mock-mode alternative in its description rather than via schema defaults.
