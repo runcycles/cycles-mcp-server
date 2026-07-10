@@ -17,7 +17,7 @@ Set your environment variables:
 
 ```bash
 export CYCLES_API_KEY=your-api-key-here
-export CYCLES_BASE_URL=https://api.runcycles.io  # optional
+export CYCLES_BASE_URL=https://api.runcycles.io  # required — your Cycles server URL
 ```
 
 For local development with mock responses:

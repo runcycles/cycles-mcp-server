@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Fixed
+
+- `server.json` registry metadata now marks `CYCLES_BASE_URL` as required. It was previously listed as optional with a default of `https://api.runcycles.io`, but the runtime has no such fallback — `CyclesConfig.fromEnv()` (used by `RealClientAdapter` in `src/client-adapter.ts`) throws if the variable is unset, so the server fails to start without it. The misleading `default` is removed; the URL is kept in the description as an example value. `docs/quickstart.md` (served as the `cycles://docs/quickstart` resource) carried the same "optional" claim and is corrected to "required".
+
 ## [0.2.4] - 2026-05-03
 
 ### Changed
