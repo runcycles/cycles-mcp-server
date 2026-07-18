@@ -123,9 +123,16 @@ env: { CYCLES_API_KEY: "your-key", CYCLES_BASE_URL: "http://localhost:7878" }
 ```bash
 export CYCLES_API_KEY=your-api-key-here       # required (unless CYCLES_MOCK=true)
 export CYCLES_BASE_URL=http://localhost:7878   # required — your Cycles server URL
-export CYCLES_MOCK=true                        # optional, enables mock mode
+export CYCLES_MOCK=false                       # true disables live enforcement and returns synthetic responses
+export CYCLES_ALLOW_MOCK_IN_PRODUCTION=false  # must be true to use mock mode with NODE_ENV=production
 export PORT=3000                               # optional, for HTTP transport
+export HOST=127.0.0.1                          # optional HTTP bind address; unset binds all interfaces
+export MCP_HTTP_AUTH_TOKEN=replace-me          # optional bearer token required on /mcp when set
 ```
+
+Mock mode prints a prominent warning on every startup, and generated mock reservation/event IDs begin with `mock_`. The server refuses to start with `CYCLES_MOCK=true` and `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is also set.
+
+For HTTP transport, set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on every `/mcp` request. `/health` remains public. If no token is configured while HTTP binds to a non-loopback address, the server prints a prominent warning.
 
 **Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
 

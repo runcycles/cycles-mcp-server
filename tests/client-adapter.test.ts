@@ -8,6 +8,7 @@ import {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.unstubAllEnvs();
   vi.restoreAllMocks();
 });
 
@@ -371,15 +372,40 @@ describe("CyclesApiError", () => {
 });
 
 describe("createAdapter", () => {
-  it("returns MockClientAdapter when CYCLES_MOCK=true", () => {
-    const orig = process.env.CYCLES_MOCK;
-    process.env.CYCLES_MOCK = "true";
-    try {
-      const adapter = createAdapter();
-      expect(adapter).toBeInstanceOf(MockClientAdapter);
-    } finally {
-      if (orig === undefined) delete process.env.CYCLES_MOCK;
-      else process.env.CYCLES_MOCK = orig;
-    }
+  it("returns MockClientAdapter and prints a warning banner in mock mode", () => {
+    vi.stubEnv("CYCLES_MOCK", "true");
+    vi.stubEnv("NODE_ENV", "development");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const adapter = createAdapter();
+
+    expect(adapter).toBeInstanceOf(MockClientAdapter);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy.mock.calls[0][0]).toContain(
+      "WARNING: CYCLES MOCK MODE IS ACTIVE",
+    );
+    expect(warnSpy.mock.calls[0][0]).toContain(
+      "Live budget enforcement is DISABLED",
+    );
+  });
+
+  it("refuses mock mode in production by default", () => {
+    vi.stubEnv("CYCLES_MOCK", "true");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("CYCLES_ALLOW_MOCK_IN_PRODUCTION", "");
+
+    expect(() => createAdapter()).toThrow(
+      "Refusing to start with CYCLES_MOCK=true in production",
+    );
+  });
+
+  it("allows an explicit production mock override and still warns", () => {
+    vi.stubEnv("CYCLES_MOCK", "true");
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("CYCLES_ALLOW_MOCK_IN_PRODUCTION", "true");
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    expect(createAdapter()).toBeInstanceOf(MockClientAdapter);
+    expect(warnSpy).toHaveBeenCalledTimes(1);
   });
 });

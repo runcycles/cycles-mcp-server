@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, it, expect } from "vitest";
 import { MockClientAdapter } from "../src/client-adapter.js";
 import { createServer, VERSION } from "../src/server.js";
@@ -10,8 +11,11 @@ describe("createServer", () => {
     expect(server.server).toBeDefined();
   });
 
-  it("VERSION is set", () => {
-    expect(VERSION).toBe("0.2.0");
+  it("derives VERSION from package.json", () => {
+    const packageJson = JSON.parse(
+      readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+    ) as { version: string };
+    expect(VERSION).toBe(packageJson.version);
   });
 
   it("has all 9 tools registered", () => {

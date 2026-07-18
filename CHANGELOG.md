@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 ## [Unreleased]
 
+### Added
+
+- Optional `MCP_HTTP_AUTH_TOKEN` bearer authentication for all Streamable HTTP `/mcp` methods. Configured requests without the exact `Authorization: Bearer <token>` header receive `401 Unauthorized`; stdio transport and `/health` are unchanged.
+
+### Changed
+
+- Mock reservation and event IDs now use a `mock_` prefix so downstream consumers can identify synthetic results.
+- The MCP server runtime version is derived from `package.json` instead of a stale hardcoded constant.
+- `.env.example` now defaults `CYCLES_MOCK=false` and documents the enforcement implications of enabling it.
+
+### Security
+
+- Mock mode now emits a prominent warning on every startup and is refused when `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is explicitly set.
+- Unauthenticated HTTP startup now emits a prominent warning whenever the bind address is not loopback.
+
 ### Fixed
 
 - `server.json` registry metadata now marks `CYCLES_BASE_URL` as required. It was previously listed as optional with a default of `https://api.runcycles.io`, but the runtime has no such fallback — `CyclesConfig.fromEnv()` (used by `RealClientAdapter` in `src/client-adapter.ts`) throws if the variable is unset, so the server fails to start without it. The misleading `default` is removed; the URL is kept in the description as an example value. `docs/quickstart.md` (served as the `cycles://docs/quickstart` resource) carried the same "optional" claim and is corrected to "required".

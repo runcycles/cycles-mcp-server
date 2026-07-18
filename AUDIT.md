@@ -1,9 +1,9 @@
-# Cycles Protocol v0.1.23 — MCP Server Audit
+# Cycles Protocol v0.1.24 — MCP Server Audit
 
-**Date:** 2026-03-19
-**Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.23)
-**MCP Server:** `@runcycles/mcp-server` v0.1.1 (Node 20+ / @modelcontextprotocol/sdk / TypeScript 5)
-**Client dependency:** `runcycles` v0.1.1 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
+**Date:** 2026-07-18
+**Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.24)
+**MCP Server:** `@runcycles/mcp-server` v0.2.4 (Node 20+ / `@modelcontextprotocol/sdk` / TypeScript 6)
+**Client dependency:** `runcycles` ^0.3.0 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
 
 ---
 
@@ -16,6 +16,8 @@
 | Tool Output Schemas ↔ Spec Response Schemas | 9/9 | 0 |
 | Enum Values in Zod Schemas | 5/5 | 0 |
 | Auth (X-Cycles-API-Key delegation) | — | 0 |
+| MCP HTTP Bearer Auth / Bind Warnings | — | 0 |
+| Mock-Mode Startup Safety | — | 0 |
 | Idempotency Key Propagation | — | 0 |
 | Subject Validation (≥1 standard field) | — | 0 |
 | Error Handling (protocol error codes) | — | 0 |
@@ -35,6 +37,8 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 - All tool output shapes vs spec response schemas (via `runcycles` mapper functions)
 - All 5 enum types and their Zod enum values
 - Auth delegation through `runcycles` CyclesClient
+- Optional bearer authentication and unauthenticated bind warnings for Streamable HTTP
+- Mock-mode warning, production refusal, and detectable synthetic identifiers
 - Idempotency key propagation through `runcycles` client (body + header sync)
 - Subject validation (at least one standard field) in tool handlers
 - Mock responses structural match to spec response schemas
@@ -115,11 +119,13 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 | `ReservationStatus` | `ReservationStatusEnum` | `ACTIVE`, `COMMITTED`, `RELEASED`, `EXPIRED` | PASS |
 | `ErrorCode` | (returned by runcycles) | All 12 spec values + `UNKNOWN` (client fallback) | PASS |
 
-### Auth (correct — delegated to runcycles)
+### Auth (correct — Cycles API delegation and MCP HTTP boundary)
 
 - Auth is handled by `runcycles` CyclesClient, which sets `X-Cycles-API-Key` header on all requests
 - MCP server's `RealClientAdapter` constructs `CyclesClient` via `CyclesConfig.fromEnv()`, reading `CYCLES_API_KEY` env var
-- The MCP server itself does not handle auth — it delegates entirely to the underlying client library
+- Streamable HTTP optionally enforces `MCP_HTTP_AUTH_TOKEN` on every `/mcp` method using an exact bearer-token check and returns `401 Unauthorized` with `WWW-Authenticate: Bearer` on failure
+- The `/health` endpoint remains public, and stdio transport is unchanged
+- Unauthenticated non-loopback HTTP binds emit a prominent startup warning
 
 ### Idempotency Key Propagation (correct — delegated to runcycles)
 
@@ -161,9 +167,9 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 
 ### Test Coverage (correct)
 
-- 157 tests across 8 test files
-- Line coverage: 97.30% (threshold: 95%)
-- Branch coverage: 94.87% (threshold: 85%)
+- 173 tests across 8 test files
+- Line coverage: 98.93% (threshold: 95%)
+- Branch coverage: 93.51% (threshold: 85%)
 - All tool handlers tested: happy path, error paths, edge cases
 - Mock responses validated for structural match to protocol types
 - Client adapter tested for both real (mocked fetch) and mock implementations
@@ -215,7 +221,7 @@ npm package includes: `dist/`, `docs/`, `server.json`, `LICENSE`, `README.md`.
 
 ## Verdict
 
-The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.23 OpenAPI spec. All 9 tools map 1:1 to protocol endpoints. Zod input schemas enforce the same constraints as the spec (required fields, enum values, numeric bounds). Tool outputs match spec response schemas via `runcycles` wire-format mappers. Auth, idempotency, and subject validation are correctly delegated to or validated against the spec. Mock responses are structurally identical to real protocol responses. CI pipeline validates all quality gates (typecheck, lint, build, 157 tests with coverage thresholds). No open issues.
+The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24 OpenAPI spec. All 9 tools map 1:1 to protocol endpoints. Zod input schemas enforce the same constraints as the spec (required fields, enum values, numeric bounds). Tool outputs match spec response schemas via `runcycles` wire-format mappers. Auth, idempotency, and subject validation are correctly delegated to or validated against the spec. Mock responses remain protocol-shaped while generated mock identifiers are visibly tagged. CI validates typecheck, lint, build, and coverage gates. No open issues.
 
 ---
 
@@ -226,3 +232,25 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.23
 **Issue:** `server.json` listed `CYCLES_BASE_URL` as `isRequired: false` with `"default": "https://api.runcycles.io"`, but the runtime has no such fallback. `RealClientAdapter` (`src/client-adapter.ts`) constructs its client via `CyclesConfig.fromEnv()`, which throws `CYCLES_BASE_URL environment variable is required` when the variable is unset — so the server fails to start without it (except in `CYCLES_MOCK=true` mode, which uses `MockClientAdapter` and reads no env config). Users following the registry metadata and omitting the variable would hit a startup crash instead of the advertised default.
 
 **Fix:** `CYCLES_BASE_URL` is now `isRequired: true` and the misleading `default` is removed. The production URL is retained in the `description` as an example value (`"URL of the Cycles server (e.g. https://api.runcycles.io)"`), matching how `CYCLES_API_KEY` documents its mock-mode alternative in its description rather than via schema defaults.
+
+---
+
+## Runtime Safety and HTTP Authentication Review (2026-07-18)
+
+### Mock mode
+
+**Issue:** `CYCLES_MOCK=true` silently selected synthetic responses that allow operations without contacting the Cycles service, and `.env.example` enabled that mode by default.
+
+**Fix:** `.env.example` now defaults to `false`; allowed mock startups print an unmissable warning; production startup refuses mock mode unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true`; and generated mock reservation/event IDs begin with `mock_` for downstream detection.
+
+### Streamable HTTP transport
+
+**Issue:** `/mcp` had no transport-level authentication, including on non-loopback binds.
+
+**Fix:** `MCP_HTTP_AUTH_TOKEN`, when set, requires the exact `Authorization: Bearer <token>` header for POST, GET, and DELETE `/mcp` requests. Missing or incorrect credentials return `401` without reaching the MCP transport. When the token is unset and the bind is non-loopback, startup emits a prominent warning. Stdio and the public `/health` endpoint are unchanged.
+
+### Version reporting
+
+**Issue:** Server metadata and `/health` reported a hardcoded `0.2.0` while `package.json` was `0.2.4`.
+
+**Fix:** Runtime version metadata is loaded from `package.json`, eliminating the duplicate version constant.

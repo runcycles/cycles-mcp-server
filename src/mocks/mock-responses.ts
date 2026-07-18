@@ -57,7 +57,7 @@ export function mockReservationCreateResponse(
   const now = Date.now();
   return {
     decision: Decision.ALLOW,
-    reservationId: `rsv_${randomUUID()}`,
+    reservationId: `mock_rsv_${randomUUID()}`,
     affectedScopes: [scopePath],
     expiresAtMs: now + (req.ttlMs ?? 60_000),
     scopePath,
@@ -113,7 +113,7 @@ export function mockEventCreateResponse(
 ): EventCreateResponse {
   return {
     status: EventStatus.APPLIED,
-    eventId: `evt_${randomUUID()}`,
+    eventId: `mock_evt_${randomUUID()}`,
   };
 }
 
@@ -132,7 +132,7 @@ export function mockReservationListResponse(): ReservationListResponse {
   return {
     reservations: [
       {
-        reservationId: `rsv_${randomUUID()}`,
+        reservationId: `mock_rsv_${randomUUID()}`,
         status: ReservationStatus.ACTIVE,
         subject: { tenant: "mock-tenant" },
         action: { kind: "llm.completion", name: "openai:gpt-4o" },

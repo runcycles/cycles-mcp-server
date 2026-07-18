@@ -20,7 +20,7 @@ describe("mockReservationCreateResponse", () => {
       estimate: { unit: "TOKENS", amount: 1000 },
     });
     expect(resp.decision).toBe("ALLOW");
-    expect(resp.reservationId).toMatch(/^rsv_/);
+    expect(resp.reservationId).toMatch(/^mock_rsv_/);
     expect(resp.affectedScopes[0]).toBe("tenant:t1/workflow:w1");
     expect(resp.scopePath).toBe("tenant:t1/workflow:w1");
     expect(resp.reserved).toEqual({ unit: "TOKENS", amount: 1000 });
@@ -103,7 +103,7 @@ describe("mockEventCreateResponse", () => {
       actual: { unit: "TOKENS", amount: 500 },
     });
     expect(resp.status).toBe("APPLIED");
-    expect(resp.eventId).toMatch(/^evt_/);
+    expect(resp.eventId).toMatch(/^mock_evt_/);
   });
 });
 
@@ -133,7 +133,7 @@ describe("mockReservationListResponse", () => {
     const resp = mockReservationListResponse();
     expect(resp.reservations).toHaveLength(1);
     expect(resp.reservations[0].status).toBe("ACTIVE");
-    expect(resp.reservations[0].reservationId).toMatch(/^rsv_/);
+    expect(resp.reservations[0].reservationId).toMatch(/^mock_rsv_/);
   });
 });
 
