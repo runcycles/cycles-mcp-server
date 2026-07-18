@@ -26,6 +26,8 @@ For local development with mock responses:
 export CYCLES_MOCK=true
 ```
 
+Mock mode disables live budget enforcement, prints a warning banner, and prefixes generated reservation/event IDs with `mock_`. It is refused when `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is explicitly set.
+
 ## Running
 
 ### stdio transport (for Claude Desktop / Claude Code)
@@ -42,6 +44,8 @@ npx @runcycles/mcp-server --transport http
 # Health check: GET /health
 # MCP endpoint: POST /mcp
 ```
+
+Set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on all `/mcp` requests; blank or whitespace-only values are rejected at startup. The `/health` endpoint stays public. Set `HOST` to choose the bind address; the server warns if authentication is unset on a non-loopback bind.
 
 ## Your First Budget Check
 

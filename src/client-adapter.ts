@@ -236,6 +236,24 @@ export class MockClientAdapter implements ClientAdapter {
 
 export function createAdapter(): ClientAdapter {
   if (process.env.CYCLES_MOCK === "true") {
+    if (
+      process.env.NODE_ENV === "production" &&
+      process.env.CYCLES_ALLOW_MOCK_IN_PRODUCTION !== "true"
+    ) {
+      throw new Error(
+        "Refusing to start with CYCLES_MOCK=true in production. Mock mode disables live budget enforcement. Set CYCLES_ALLOW_MOCK_IN_PRODUCTION=true only if this is intentional.",
+      );
+    }
+
+    console.warn(
+      [
+        "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+        "WARNING: CYCLES MOCK MODE IS ACTIVE",
+        "Live budget enforcement is DISABLED. Responses are synthetic",
+        "and allow operations without contacting a Cycles server.",
+        "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+      ].join("\n"),
+    );
     return new MockClientAdapter();
   }
   return new RealClientAdapter();
