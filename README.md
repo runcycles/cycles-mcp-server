@@ -132,7 +132,7 @@ export MCP_HTTP_AUTH_TOKEN=replace-me          # optional bearer token required 
 
 Mock mode prints a prominent warning on every startup, and generated mock reservation/event IDs begin with `mock_`. The server refuses to start with `CYCLES_MOCK=true` and `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is also set.
 
-For HTTP transport, set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on every `/mcp` request. `/health` remains public. If no token is configured while HTTP binds to a non-loopback address, the server prints a prominent warning.
+For HTTP transport, set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on every `/mcp` request. Blank or whitespace-only configured tokens are rejected at startup. `/health` remains public. If no token is configured while HTTP binds to a non-loopback address, the server prints a prominent warning.
 
 **Need an API key?** API keys are created via the Cycles Admin Server (port 7979). See the [deployment guide](https://runcycles.io/quickstart/deploying-the-full-cycles-stack#step-3-create-an-api-key) to create one, or run:
 
@@ -246,7 +246,7 @@ CI runs: test (Node 20+22) → npm publish → MCP Registry publish.
 
 ## Protocol Conformance
 
-This MCP server is audited against the Cycles Protocol v0.1.23 OpenAPI spec. See [AUDIT.md](AUDIT.md) for the full conformance report.
+This MCP server is audited against the Cycles Protocol v0.1.24 OpenAPI spec. See [AUDIT.md](AUDIT.md) for the full conformance report.
 
 ## License
 

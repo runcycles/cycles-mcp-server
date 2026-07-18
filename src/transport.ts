@@ -79,13 +79,20 @@ export function createHttpApp(
   transport: HttpRequestTransport,
   authToken?: string,
 ): Express {
+  if (authToken !== undefined && authToken.trim().length === 0) {
+    throw new Error(
+      "MCP_HTTP_AUTH_TOKEN must not be empty or whitespace-only when configured.",
+    );
+  }
+
   const app = express();
 
   app.get("/health", (_req, res) => {
     res.json({ status: "ok", version: VERSION });
   });
 
-  const authHandlers = authToken ? [bearerAuth(authToken)] : [];
+  const authHandlers =
+    authToken === undefined ? [] : [bearerAuth(authToken)];
   const handleMcpRequest: RequestHandler = async (req, res) => {
     await transport.handleRequest(req, res);
   };
@@ -109,7 +116,7 @@ export async function startHttp(
   });
   const app = createHttpApp(transport, authToken);
 
-  if (!authToken && !isLoopbackAddress(host)) {
+  if (authToken === undefined && !isLoopbackAddress(host)) {
     console.warn(
       [
         "WARNING: MCP HTTP authentication is disabled on a non-loopback bind.",

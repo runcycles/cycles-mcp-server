@@ -79,6 +79,30 @@ describe("startStdio", () => {
 });
 
 describe("HTTP bearer authentication", () => {
+  it.each(["", " ", "\t"])(
+    "refuses a blank configured token %j",
+    (authToken) => {
+      expect(() =>
+        createHttpApp({ handleRequest: vi.fn() }, authToken),
+      ).toThrow(
+        "MCP_HTTP_AUTH_TOKEN must not be empty or whitespace-only",
+      );
+    },
+  );
+
+  it("refuses a blank token from the environment before startup", async () => {
+    const server = createServer(new MockClientAdapter());
+    const connectSpy = vi.spyOn(server, "connect").mockResolvedValue();
+    vi.stubEnv("MCP_HTTP_AUTH_TOKEN", " ");
+
+    await expect(
+      startHttp(server, 0, { host: "0.0.0.0" }),
+    ).rejects.toThrow(
+      "MCP_HTTP_AUTH_TOKEN must not be empty or whitespace-only",
+    );
+    expect(connectSpy).not.toHaveBeenCalled();
+  });
+
   it("rejects missing and invalid bearer tokens on /mcp", async () => {
     const handleRequest = vi.fn(async (_req, res) => {
       res.sendStatus(204);
@@ -185,7 +209,7 @@ describe("HTTP bind warnings", () => {
     vi.spyOn(server, "connect").mockResolvedValue();
     vi.spyOn(console, "error").mockImplementation(() => {});
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.stubEnv("MCP_HTTP_AUTH_TOKEN", "");
+    vi.stubEnv("MCP_HTTP_AUTH_TOKEN", undefined);
 
     const app = await startHttp(server, 0, { host: "0.0.0.0" });
     try {
@@ -203,7 +227,7 @@ describe("HTTP bind warnings", () => {
     const connectSpy = vi.spyOn(server, "connect").mockResolvedValue();
     vi.spyOn(console, "error").mockImplementation(() => {});
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
-    vi.stubEnv("MCP_HTTP_AUTH_TOKEN", "");
+    vi.stubEnv("MCP_HTTP_AUTH_TOKEN", undefined);
 
     const app = await startHttp(server, 0, {
       host: "127.0.0.1",

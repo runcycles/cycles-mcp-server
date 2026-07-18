@@ -45,7 +45,7 @@ npx @runcycles/mcp-server --transport http
 # MCP endpoint: POST /mcp
 ```
 
-Set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on all `/mcp` requests. The `/health` endpoint stays public. Set `HOST` to choose the bind address; the server warns if authentication is unset on a non-loopback bind.
+Set `MCP_HTTP_AUTH_TOKEN` to require `Authorization: Bearer <token>` on all `/mcp` requests; blank or whitespace-only values are rejected at startup. The `/health` endpoint stays public. Set `HOST` to choose the bind address; the server warns if authentication is unset on a non-loopback bind.
 
 ## Your First Budget Check
 

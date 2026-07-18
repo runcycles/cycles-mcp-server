@@ -124,6 +124,7 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 - Auth is handled by `runcycles` CyclesClient, which sets `X-Cycles-API-Key` header on all requests
 - MCP server's `RealClientAdapter` constructs `CyclesClient` via `CyclesConfig.fromEnv()`, reading `CYCLES_API_KEY` env var
 - Streamable HTTP optionally enforces `MCP_HTTP_AUTH_TOKEN` on every `/mcp` method using an exact bearer-token check and returns `401 Unauthorized` with `WWW-Authenticate: Bearer` on failure
+- Blank or whitespace-only configured HTTP auth tokens refuse startup before the MCP server connects or listens
 - The `/health` endpoint remains public, and stdio transport is unchanged
 - Unauthenticated non-loopback HTTP binds emit a prominent startup warning
 
@@ -167,9 +168,9 @@ Compared the following across spec YAML, `runcycles` client types, and MCP serve
 
 ### Test Coverage (correct)
 
-- 173 tests across 8 test files
-- Line coverage: 98.93% (threshold: 95%)
-- Branch coverage: 93.51% (threshold: 85%)
+- 177 tests across 8 test files
+- Line coverage: 98.94% (threshold: 95%)
+- Branch coverage: 93.75% (threshold: 85%)
 - All tool handlers tested: happy path, error paths, edge cases
 - Mock responses validated for structural match to protocol types
 - Client adapter tested for both real (mocked fetch) and mock implementations
@@ -247,7 +248,7 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 
 **Issue:** `/mcp` had no transport-level authentication, including on non-loopback binds.
 
-**Fix:** `MCP_HTTP_AUTH_TOKEN`, when set, requires the exact `Authorization: Bearer <token>` header for POST, GET, and DELETE `/mcp` requests. Missing or incorrect credentials return `401` without reaching the MCP transport. When the token is unset and the bind is non-loopback, startup emits a prominent warning. Stdio and the public `/health` endpoint are unchanged.
+**Fix:** `MCP_HTTP_AUTH_TOKEN`, when set, requires the exact `Authorization: Bearer <token>` header for POST, GET, and DELETE `/mcp` requests. Missing or incorrect credentials return `401` without reaching the MCP transport. Blank or whitespace-only configured tokens refuse startup before the server connects or listens. When the token is unset and the bind is non-loopback, startup emits a prominent warning. Stdio and the public `/health` endpoint are unchanged.
 
 ### Version reporting
 

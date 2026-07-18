@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 - Mock mode now emits a prominent warning on every startup and is refused when `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is explicitly set.
 - Unauthenticated HTTP startup now emits a prominent warning whenever the bind address is not loopback.
+- Explicitly configured blank or whitespace-only `MCP_HTTP_AUTH_TOKEN` values now refuse startup instead of disabling authentication.
 
 ### Fixed
 
