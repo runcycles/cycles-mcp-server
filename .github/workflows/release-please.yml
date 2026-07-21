@@ -13,12 +13,29 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # gh workflow run calls the workflow-dispatch API, which needs
+      # actions: write — an explicit permissions block zeroes anything
+      # unlisted, so without this the dispatch steps below get a 403.
+      actions: write
     steps:
       - uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071 # v4.4.1
         id: release
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
+      # PRs created by GITHUB_TOKEN do not trigger pull_request workflows,
+      # and main requires the "test / Test (Node 20/22)" checks from ci.yml —
+      # the release PR would be unmergeable. Dispatching ci.yml at the
+      # release branch attaches those check runs to the PR's head SHA
+      # (required checks are commit-scoped). ci.yml's publish jobs stay
+      # skipped because the ref is not a v* tag.
+      # NOTE: repo setting "Allow GitHub Actions to create and approve pull
+      # requests" must be enabled for release-please to open the PR at all.
+      - name: Run required checks on the release PR branch
+        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "release-please--branches--main"
       # Tags created with GITHUB_TOKEN do not trigger other workflows, so the
       # v* publish pipeline in ci.yml would never fire. workflow_dispatch is
       # exempt from that restriction, and ci.yml's tag-conditional jobs match
