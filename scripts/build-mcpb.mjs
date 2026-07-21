@@ -43,24 +43,52 @@ cpSync("docs", "build-mcpb/docs", { recursive: true });
 // bundler strips comments, so the notices must ship as files.
 cpSync("LICENSE", "build-mcpb/LICENSE");
 
+const LICENSE_FILENAMES = [
+  "LICENSE",
+  "LICENSE.md",
+  "LICENSE.txt",
+  "LICENCE",
+  "LICENCE.md",
+  "license",
+  "License.md",
+  "COPYING",
+  "COPYING.md",
+  "LICENSE-MIT",
+  "LICENSE-MIT.txt",
+  "LICENSE-APACHE",
+  "LICENSE.APACHE2",
+  "LICENSE.BSD",
+];
+
 const lock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const notices = ["# Third-Party Notices", "", "This bundle inlines the following packages:", ""];
+const missing = [];
+let bundled = 0;
 for (const [path, info] of Object.entries(lock.packages)) {
   if (path === "" || info.dev || info.extraneous) continue;
+  bundled += 1;
   const name = path.replace(/^.*node_modules\//, "");
   notices.push(`---`, ``, `## ${name}@${info.version} (${info.license ?? "unknown license"})`, ``);
-  const licenseFile = ["LICENSE", "LICENSE.md", "LICENSE.txt", "LICENCE", "license", "License.md"]
-    .map((f) => `${path}/${f}`)
-    .find((f) => existsSync(f));
+  const licenseFile = LICENSE_FILENAMES.map((f) => `${path}/${f}`).find((f) => existsSync(f));
   if (licenseFile) {
     notices.push(readFileSync(licenseFile, "utf8").trim(), "");
   } else {
-    notices.push(`(No license file shipped in the package; declared license: ${info.license ?? "unknown"}.)`, "");
+    missing.push(`${name}@${info.version}`);
   }
 }
+// Hard gate: shipping the bundle without a dependency's license text would
+// silently recreate the compliance problem this file exists to solve. Either
+// the package ships its license under a name not yet in LICENSE_FILENAMES
+// (add it above), or it genuinely ships none (resolve before packing).
+if (missing.length > 0) {
+  console.error(
+    `License text missing for ${missing.length} bundled package(s): ${missing.join(", ")}\n` +
+      "Add the filename to LICENSE_FILENAMES if it exists under another name, or resolve the packaging gap before shipping.",
+  );
+  process.exit(1);
+}
 writeFileSync("build-mcpb/THIRD-PARTY-NOTICES.md", notices.join("\n"));
-const missing = notices.filter((l) => l.startsWith("(No license file")).length;
-console.log(`Third-party notices: ${Object.entries(lock.packages).filter(([p, i]) => p !== "" && !i.dev && !i.extraneous).length} packages, ${missing} without license files`);
+console.log(`Third-party notices: ${bundled} packages, all license texts included`);
 
 const manifest = readFileSync("mcpb/manifest.template.json", "utf8").replace(
   "__VERSION__",
