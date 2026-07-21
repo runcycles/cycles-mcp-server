@@ -278,6 +278,12 @@ CI runs: test (Node 20+22) → npm publish → MCP Registry publish.
 
 This MCP server is audited against the Cycles Protocol v0.1.24 OpenAPI spec. See [AUDIT.md](AUDIT.md) for the full conformance report.
 
+## Privacy Policy
+
+Full policy: **[runcycles.io/privacy](https://runcycles.io/privacy)**
+
+The short version: this server connects only to the Cycles server URL you configure and sends it budget requests (subject identifiers, amounts, usage metrics) — Cycles is self-hosted, so that data stays in your infrastructure and never reaches runcycles. No LLM prompts or responses are stored. The server contains no telemetry, phone-home, or update checks. In mock mode, no network requests are made at all. Your API key lives in your local configuration and is sent only to your configured Cycles server.
+
 ## License
 
 Apache-2.0
