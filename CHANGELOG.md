@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 ### Added
 
-- Claude Desktop extension bundle (`.mcpb`): every GitHub release now attaches `cycles-mcp-server-<version>.mcpb` — a self-contained single-file bundle with a config UI for the Cycles server URL, API key, and mock mode. Built via `npm run build:mcpb` (single-file CJS bundle, all dependencies inlined, docs included; validated and packed with the pinned `@anthropic-ai/mcpb` CLI invoked ephemerally so its dependency tree stays out of this package's).
+- Claude Desktop extension bundle (`.mcpb`): every GitHub release now attaches `cycles-mcp-server-<version>.mcpb` — a self-contained single-file bundle with a config UI for the Cycles server URL, API key, and mock mode. Built via `npm run build:mcpb` (single-file CJS bundle, all dependencies inlined, docs included; validated and packed with the pinned `@anthropic-ai/mcpb` CLI invoked ephemerally so its dependency tree stays out of this package's). The archive includes this project's Apache-2.0 `LICENSE` (§4(a) redistribution requirement) and a generated `THIRD-PARTY-NOTICES.md` with the full license texts of all 94 inlined packages, since the bundler strips their comment-level notices.
 
 ### Fixed
 

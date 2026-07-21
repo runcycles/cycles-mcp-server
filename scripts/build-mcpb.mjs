@@ -37,6 +37,31 @@ if (!existsSync("build-mcpb/server/index.cjs")) {
 // (../docs relative to server/index.cjs).
 cpSync("docs", "build-mcpb/docs", { recursive: true });
 
+// License compliance for a distributed artifact: Apache-2.0 §4(a) requires
+// recipients receive a copy of this project's license, and the inlined
+// dependencies' MIT licenses require their full permission notices — the
+// bundler strips comments, so the notices must ship as files.
+cpSync("LICENSE", "build-mcpb/LICENSE");
+
+const lock = JSON.parse(readFileSync("package-lock.json", "utf8"));
+const notices = ["# Third-Party Notices", "", "This bundle inlines the following packages:", ""];
+for (const [path, info] of Object.entries(lock.packages)) {
+  if (path === "" || info.dev || info.extraneous) continue;
+  const name = path.replace(/^.*node_modules\//, "");
+  notices.push(`---`, ``, `## ${name}@${info.version} (${info.license ?? "unknown license"})`, ``);
+  const licenseFile = ["LICENSE", "LICENSE.md", "LICENSE.txt", "LICENCE", "license", "License.md"]
+    .map((f) => `${path}/${f}`)
+    .find((f) => existsSync(f));
+  if (licenseFile) {
+    notices.push(readFileSync(licenseFile, "utf8").trim(), "");
+  } else {
+    notices.push(`(No license file shipped in the package; declared license: ${info.license ?? "unknown"}.)`, "");
+  }
+}
+writeFileSync("build-mcpb/THIRD-PARTY-NOTICES.md", notices.join("\n"));
+const missing = notices.filter((l) => l.startsWith("(No license file")).length;
+console.log(`Third-party notices: ${Object.entries(lock.packages).filter(([p, i]) => p !== "" && !i.dev && !i.extraneous).length} packages, ${missing} without license files`);
+
 const manifest = readFileSync("mcpb/manifest.template.json", "utf8").replace(
   "__VERSION__",
   version,
