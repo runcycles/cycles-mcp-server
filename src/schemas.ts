@@ -155,8 +155,12 @@ export const CreateEventInputSchema = z.object({
 // ---------------------------------------------------------------------------
 // Tool output schemas (MCP structuredContent), mirroring the spec response
 // schemas as mapped by the `runcycles` client. Field optionality follows the
-// spec exactly; enum-like status fields stay open strings so additive protocol
-// values never invalidate a response.
+// spec exactly. Two deliberate loosenings so a spec-valid live response can
+// never fail the SDK's structuredContent validation: enum-like status fields
+// stay open strings (additive protocol values), and optional fields are
+// nullish (the runcycles mappers pass scalar wire fields through untouched,
+// so a server emitting explicit JSON nulls for absent fields reaches us as
+// null, not undefined).
 // ---------------------------------------------------------------------------
 
 export const DecisionEnum = z.enum(["ALLOW", "ALLOW_WITH_CAPS", "DENY"]);
@@ -167,39 +171,39 @@ const OutputAmountSchema = z.object({
 });
 
 const OutputSubjectSchema = z.object({
-  tenant: z.string().optional(),
-  workspace: z.string().optional(),
-  app: z.string().optional(),
-  workflow: z.string().optional(),
-  agent: z.string().optional(),
-  toolset: z.string().optional(),
-  dimensions: z.record(z.string(), z.string()).optional(),
+  tenant: z.string().nullish(),
+  workspace: z.string().nullish(),
+  app: z.string().nullish(),
+  workflow: z.string().nullish(),
+  agent: z.string().nullish(),
+  toolset: z.string().nullish(),
+  dimensions: z.record(z.string(), z.string()).nullish(),
 });
 
 const OutputActionSchema = z.object({
   kind: z.string(),
   name: z.string(),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).nullish(),
 });
 
 export const CapsSchema = z.object({
-  maxTokens: z.number().optional(),
-  maxStepsRemaining: z.number().optional(),
-  toolAllowlist: z.array(z.string()).optional(),
-  toolDenylist: z.array(z.string()).optional(),
-  cooldownMs: z.number().optional(),
+  maxTokens: z.number().nullish(),
+  maxStepsRemaining: z.number().nullish(),
+  toolAllowlist: z.array(z.string()).nullish(),
+  toolDenylist: z.array(z.string()).nullish(),
+  cooldownMs: z.number().nullish(),
 });
 
 export const BalanceEntrySchema = z.object({
   scope: z.string(),
   scopePath: z.string(),
   remaining: OutputAmountSchema,
-  reserved: OutputAmountSchema.optional(),
-  spent: OutputAmountSchema.optional(),
-  allocated: OutputAmountSchema.optional(),
-  debt: OutputAmountSchema.optional(),
-  overdraftLimit: OutputAmountSchema.optional(),
-  isOverLimit: z.boolean().optional(),
+  reserved: OutputAmountSchema.nullish(),
+  spent: OutputAmountSchema.nullish(),
+  allocated: OutputAmountSchema.nullish(),
+  debt: OutputAmountSchema.nullish(),
+  overdraftLimit: OutputAmountSchema.nullish(),
+  isOverLimit: z.boolean().nullish(),
 });
 
 const ReservationSummarySchema = z.object({
@@ -212,59 +216,59 @@ const ReservationSummarySchema = z.object({
   expiresAtMs: z.number(),
   scopePath: z.string(),
   affectedScopes: z.array(z.string()),
-  idempotencyKey: z.string().optional(),
+  idempotencyKey: z.string().nullish(),
 });
 
 export const ReserveOutputSchema = {
   decision: DecisionEnum,
-  reservationId: z.string().optional(),
+  reservationId: z.string().nullish(),
   affectedScopes: z.array(z.string()),
-  expiresAtMs: z.number().optional(),
-  scopePath: z.string().optional(),
-  reserved: OutputAmountSchema.optional(),
-  caps: CapsSchema.optional(),
-  reasonCode: z.string().optional(),
-  retryAfterMs: z.number().optional(),
-  balances: z.array(BalanceEntrySchema).optional(),
+  expiresAtMs: z.number().nullish(),
+  scopePath: z.string().nullish(),
+  reserved: OutputAmountSchema.nullish(),
+  caps: CapsSchema.nullish(),
+  reasonCode: z.string().nullish(),
+  retryAfterMs: z.number().nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
 };
 
 export const CommitOutputSchema = {
   status: z.string(),
   charged: OutputAmountSchema,
-  released: OutputAmountSchema.optional(),
-  balances: z.array(BalanceEntrySchema).optional(),
+  released: OutputAmountSchema.nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
 };
 
 export const ReleaseOutputSchema = {
   status: z.string(),
   released: OutputAmountSchema,
-  balances: z.array(BalanceEntrySchema).optional(),
+  balances: z.array(BalanceEntrySchema).nullish(),
 };
 
 export const ExtendOutputSchema = {
   status: z.string(),
   expiresAtMs: z.number(),
-  balances: z.array(BalanceEntrySchema).optional(),
+  balances: z.array(BalanceEntrySchema).nullish(),
 };
 
 export const DecideOutputSchema = {
   decision: DecisionEnum,
-  caps: CapsSchema.optional(),
-  reasonCode: z.string().optional(),
-  retryAfterMs: z.number().optional(),
-  affectedScopes: z.array(z.string()).optional(),
+  caps: CapsSchema.nullish(),
+  reasonCode: z.string().nullish(),
+  retryAfterMs: z.number().nullish(),
+  affectedScopes: z.array(z.string()).nullish(),
 };
 
 export const CheckBalanceOutputSchema = {
   balances: z.array(BalanceEntrySchema),
-  hasMore: z.boolean().optional(),
-  nextCursor: z.string().optional(),
+  hasMore: z.boolean().nullish(),
+  nextCursor: z.string().nullish(),
 };
 
 export const ListReservationsOutputSchema = {
   reservations: z.array(ReservationSummarySchema),
-  hasMore: z.boolean().optional(),
-  nextCursor: z.string().optional(),
+  hasMore: z.boolean().nullish(),
+  nextCursor: z.string().nullish(),
 };
 
 export const GetReservationOutputSchema = {
@@ -277,17 +281,17 @@ export const GetReservationOutputSchema = {
   expiresAtMs: z.number(),
   scopePath: z.string(),
   affectedScopes: z.array(z.string()),
-  idempotencyKey: z.string().optional(),
-  committed: OutputAmountSchema.optional(),
-  finalizedAtMs: z.number().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
+  idempotencyKey: z.string().nullish(),
+  committed: OutputAmountSchema.nullish(),
+  finalizedAtMs: z.number().nullish(),
+  metadata: z.record(z.string(), z.unknown()).nullish(),
 };
 
 export const CreateEventOutputSchema = {
   status: z.string(),
   eventId: z.string(),
-  charged: OutputAmountSchema.optional(),
-  balances: z.array(BalanceEntrySchema).optional(),
+  charged: OutputAmountSchema.nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
 };
 
 export function validateSubject(subject: Record<string, unknown>): string | null {
