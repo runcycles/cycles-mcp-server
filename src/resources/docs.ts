@@ -3,15 +3,33 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const DOCS_DIR = resolve(__dirname, "../../docs");
+// The docs directory sits at ../docs relative to the BUNDLED module (npm
+// package: dist/index.js next to docs/; MCPB bundle: server/index.cjs next to
+// docs/) but ../../docs relative to this SOURCE file (tsx dev, vitest). Both
+// are tried in order. `import.meta.url` is undefined in the CJS MCPB bundle,
+// so module-dir resolution must not run at module load and must tolerate
+// failure — the CJS bundle relies on the __dirname branch instead.
+function moduleDir(): string | undefined {
+  if (typeof __dirname !== "undefined") return __dirname;
+  try {
+    return dirname(fileURLToPath(import.meta.url));
+  } catch {
+    return undefined;
+  }
+}
 
 function loadDoc(filename: string): string {
-  try {
-    return readFileSync(resolve(DOCS_DIR, filename), "utf-8");
-  } catch {
-    return `Documentation file ${filename} not found.`;
+  const dir = moduleDir();
+  if (dir !== undefined) {
+    for (const candidate of ["../docs", "../../docs"]) {
+      try {
+        return readFileSync(resolve(dir, candidate, filename), "utf-8");
+      } catch {
+        // try next candidate
+      }
+    }
   }
+  return `Documentation file ${filename} not found.`;
 }
 
 export function registerDocsResources(server: McpServer): void {

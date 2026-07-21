@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- Claude Desktop extension bundle (`.mcpb`): every GitHub release now attaches `cycles-mcp-server-<version>.mcpb` — a self-contained single-file bundle with a config UI for the Cycles server URL, API key, and mock mode. Built via `npm run build:mcpb` (single-file CJS bundle, all dependencies inlined, docs included; validated and packed with the pinned `@anthropic-ai/mcpb` CLI invoked ephemerally so its dependency tree stays out of this package's). The archive includes this project's Apache-2.0 `LICENSE` (§4(a) redistribution requirement) and a generated `THIRD-PARTY-NOTICES.md` with the full license texts of all 94 inlined packages, since the bundler strips their comment-level notices.
+
+### Fixed
+
+- `cycles://docs/quickstart` and `cycles://docs/patterns` resources returned "Documentation file ... not found" in every published npm version (0.1.0–0.4.0): the docs path was resolved relative to the source layout (`../../docs`), but tsup bundles everything into `dist/index.js`, from which that path escapes the package. Path resolution now tries the bundled layout (`../docs`) first, then the source layout, and works in ESM dist, the CJS MCPB bundle, tsx dev, and vitest. The post-publish smoke test now reads the quickstart resource from the published artifact so this class of bug gates the release.
+
 ## [0.4.0] - 2026-07-21
 
 Tool-metadata and release-pipeline release. Tools now carry MCP titles, annotations, and output schemas — hosts can auto-approve the read-only tools and consume typed `structuredContent`. First release published via npm Trusted Publishing (OIDC) and gated by the post-publish smoke test.

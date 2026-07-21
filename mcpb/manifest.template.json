@@ -1,0 +1,81 @@
+{
+  "manifest_version": "0.3",
+  "name": "cycles-mcp-server",
+  "display_name": "Cycles — Budget Authority for AI Agents",
+  "version": "__VERSION__",
+  "description": "Runtime budget authority for AI agents — reserve, enforce, reconcile spend across providers",
+  "long_description": "Gives Claude runtime budget, action, and audit authority via the Cycles protocol. The agent reserves budget before costly operations (LLM calls, tool invocations, external actions), commits actual usage afterward, and is denied when policy or balance would be exceeded. Includes 9 tools covering the full reserve/commit/release lifecycle, preflight decisions, balances, reservations, and fire-and-forget usage events, plus built-in prompts for designing budget strategies and diagnosing overruns. Requires a Cycles server (https://runcycles.io) — or enable mock mode to evaluate the tool surface with synthetic responses and no enforcement.",
+  "author": {
+    "name": "runcycles",
+    "url": "https://runcycles.io"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/runcycles/cycles-mcp-server"
+  },
+  "homepage": "https://runcycles.io",
+  "documentation": "https://github.com/runcycles/cycles-mcp-server#readme",
+  "support": "https://github.com/runcycles/cycles-mcp-server/issues",
+  "license": "Apache-2.0",
+  "privacy_policies": ["https://runcycles.io/privacy"],
+  "keywords": [
+    "budget",
+    "cost-control",
+    "agent",
+    "metering",
+    "governance",
+    "cycles"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.cjs",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.cjs"],
+      "env": {
+        "CYCLES_BASE_URL": "${user_config.base_url}",
+        "CYCLES_API_KEY": "${user_config.api_key}",
+        "CYCLES_MOCK": "${user_config.mock_mode}"
+      }
+    }
+  },
+  "user_config": {
+    "base_url": {
+      "type": "string",
+      "title": "Cycles Server URL",
+      "description": "URL of your Cycles server, e.g. https://api.runcycles.io. Not needed when mock mode is enabled.",
+      "required": false
+    },
+    "api_key": {
+      "type": "string",
+      "title": "Cycles API Key",
+      "description": "API key for your Cycles server. Not needed when mock mode is enabled.",
+      "sensitive": true,
+      "required": false
+    },
+    "mock_mode": {
+      "type": "boolean",
+      "title": "Mock mode (evaluation only — no enforcement)",
+      "description": "Return synthetic ALLOW responses without contacting a Cycles server. Lets you explore the tools, but performs no budget enforcement.",
+      "default": false,
+      "required": false
+    }
+  },
+  "tools": [
+    { "name": "cycles_reserve", "description": "Reserve budget before a costly operation" },
+    { "name": "cycles_commit", "description": "Commit actual usage after an operation completes" },
+    { "name": "cycles_release", "description": "Release a reservation without committing" },
+    { "name": "cycles_extend", "description": "Extend reservation TTL (heartbeat)" },
+    { "name": "cycles_decide", "description": "Lightweight preflight budget check" },
+    { "name": "cycles_check_balance", "description": "Check current budget balance for a scope" },
+    { "name": "cycles_list_reservations", "description": "List reservations with filters" },
+    { "name": "cycles_get_reservation", "description": "Get reservation details by ID" },
+    { "name": "cycles_create_event", "description": "Record usage without the reserve/commit lifecycle" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": {
+      "node": ">=20.0.0"
+    }
+  }
+}
