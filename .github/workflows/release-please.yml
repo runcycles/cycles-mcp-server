@@ -13,6 +13,9 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      # release-please manages its autorelease:* labels through the Issues
+      # API (PRs are issues) — part of the action's documented permissions.
+      issues: write
       # gh workflow run calls the workflow-dispatch API, which needs
       # actions: write — an explicit permissions block zeroes anything
       # unlisted, so without this the dispatch steps below get a 403.
