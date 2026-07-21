@@ -257,7 +257,7 @@ The server is published to two registries:
 | **npm** | `@runcycles/mcp-server` | CI publishes on `v*` tag push with provenance |
 | **MCP Registry** | `io.github.runcycles/cycles-mcp-server` | CI publishes the `server.json` manifest after npm |
 
-Releases are automated with [release-please](https://github.com/googleapis/release-please): merging conventional commits (`feat:`, `fix:`, …) to `main` maintains a release PR that accumulates the changelog and bumps the version in `package.json`, `server.json` (both fields), and the `AUDIT.md` header. **Merging the release PR** creates the tag and GitHub release, then dispatches the publish pipeline.
+Releases are automated with [release-please](https://github.com/googleapis/release-please). PRs are **squash-merged** (repo enforces squash-only) with **conventional PR titles** (`feat:`, `fix:`, …) — the PR title becomes the single commit on `main` that release-please reads. It maintains a release PR that accumulates the changelog and bumps the version in `package.json`, `server.json` (both fields), and the `AUDIT.md` header. **Merging the release PR** creates the tag and GitHub release, then dispatches the publish pipeline.
 
 CI runs on the tag: test (Node 20+22) → npm publish (Trusted Publishing/OIDC, with provenance) → smoke test against the published tarball → MCP Registry publish → MCPB desktop-extension bundle attached to the GitHub release.
 

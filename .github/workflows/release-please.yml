@@ -32,13 +32,17 @@ jobs:
       # release branch attaches those check runs to the PR's head SHA
       # (required checks are commit-scoped). ci.yml's publish jobs stay
       # skipped because the ref is not a v* tag.
+      # The branch name comes from the action output: release-please
+      # generates a component-suffixed branch here
+      # (release-please--branches--main--components--mcp-server, verified by
+      # dry-run) — never hardcode it.
       # NOTE: repo setting "Allow GitHub Actions to create and approve pull
       # requests" must be enabled for release-please to open the PR at all.
       - name: Run required checks on the release PR branch
-        if: ${{ steps.release.outputs.prs_created == 'true' }}
+        if: ${{ steps.release.outputs.prs_created == 'true' && steps.release.outputs.pr }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "release-please--branches--main"
+        run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "${{ fromJSON(steps.release.outputs.pr).headBranchName }}"
       # Tags created with GITHUB_TOKEN do not trigger other workflows, so the
       # v* publish pipeline in ci.yml would never fire. workflow_dispatch is
       # exempt from that restriction, and ci.yml's tag-conditional jobs match
