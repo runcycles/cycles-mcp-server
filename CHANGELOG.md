@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Changed
+
+- npm publish now uses npm Trusted Publishing (OIDC) instead of a long-lived `NPM_TOKEN` secret. The 0.3.0 release failed on first attempt because the token had expired; OIDC removes that failure mode. Requires the trusted publisher to be configured for the package on npmjs.com before the next release.
+- `package.json` metadata normalized per `npm pkg fix` (`repository.url` gains the `git+` prefix; `bin` path drops the `./` prefix) so npm stops auto-correcting it at publish time.
+
 ## [0.3.0] - 2026-07-21
 
 Security-hardening release. The minor bump signals two behavior changes that can affect existing deployments: mock mode now refuses to start in production without an explicit override, and blank `MCP_HTTP_AUTH_TOKEN` values now refuse startup instead of silently disabling authentication.
