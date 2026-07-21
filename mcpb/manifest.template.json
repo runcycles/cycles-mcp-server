@@ -17,6 +17,7 @@
   "documentation": "https://github.com/runcycles/cycles-mcp-server#readme",
   "support": "https://github.com/runcycles/cycles-mcp-server/issues",
   "license": "Apache-2.0",
+  "privacy_policies": ["https://runcycles.io/privacy"],
   "keywords": [
     "budget",
     "cost-control",
