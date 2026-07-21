@@ -60,7 +60,9 @@ npm install @runcycles/mcp-server
 
 ### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
+**One-click (recommended):** download `cycles-mcp-server-<version>.mcpb` from the [latest release](https://github.com/runcycles/cycles-mcp-server/releases/latest) and open it with Claude Desktop (double-click, or Settings → Extensions → drag it in). Claude Desktop shows a config screen for your Cycles server URL and API key — or enable mock mode to explore the tools without a server (no enforcement).
+
+**Manual (JSON config):** add to your `claude_desktop_config.json`:
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 

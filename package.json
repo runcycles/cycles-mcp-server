@@ -44,6 +44,7 @@
   },
   "scripts": {
     "build": "tsup",
+    "build:mcpb": "node scripts/build-mcpb.mjs",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "dev:http": "tsx src/index.ts --transport http",

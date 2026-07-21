@@ -91,7 +91,16 @@ try {
     fail(`expected mock_ reservation id, got: ${String(reservationId)}`);
   }
 
-  console.log(`SMOKE TEST PASSED: @runcycles/mcp-server@${version} — ${tools.length} tools, mock reserve OK`);
+  // Docs resources must serve real content from the published tarball —
+  // path resolution differs between source and bundled layouts, and this
+  // exact failure shipped silently in 0.1.0 through 0.4.0.
+  const doc = await client.readResource({ uri: "cycles://docs/quickstart" });
+  const docText = doc.contents?.[0]?.text ?? "";
+  if (typeof docText !== "string" || docText.includes("not found")) {
+    fail(`cycles://docs/quickstart returned fallback instead of content: ${JSON.stringify(docText.slice(0, 80))}`);
+  }
+
+  console.log(`SMOKE TEST PASSED: @runcycles/mcp-server@${version} — ${tools.length} tools, mock reserve OK, docs resources OK`);
 } catch (err) {
   fail(err instanceof Error ? err.stack ?? err.message : String(err));
 } finally {
