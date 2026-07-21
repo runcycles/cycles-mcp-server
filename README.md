@@ -8,7 +8,7 @@
 
 # Cycles MCP Server — AI agent runtime control over Model Context Protocol
 
-**MCP server that gives any MCP-compatible AI agent (Claude Code, Cursor, Windsurf, custom agents) runtime budget, action, and audit authority — enforce LLM cost limits, tool call caps, action permissions, and audit trails before execution, with zero agent code changes.** Connect via MCP and use the budget tools (`cycles_reserve`, `cycles_commit`, `cycles_release`, `cycles_decide`) directly from the agent's tool-calling loop. Powered by [Cycles](https://runcycles.io).
+**MCP server that gives any MCP-compatible AI agent (Claude Code, Cursor, Windsurf, custom agents) runtime budget, action, and audit authority — enforce LLM cost limits, tool call caps, action permissions, and audit trails before execution, with zero agent code changes.** Connect via MCP and use the budget tools (`cycles_reserve`, `cycles_commit`, `cycles_release`, `cycles_decide`) directly from the agent's tool-calling loop. Powered by [Cycles](https://runcycles.io). See [Security Model & Enforcement Boundary](#security-model--enforcement-boundary) for what is enforced server-side versus cooperatively in the agent loop.
 
 ## Why use this?
 
@@ -187,6 +187,34 @@ Optionally, before reserving:
 - `cycles_decide` — lightweight preflight check without locking funds
 
 Every reservation **must** be finalized with either `cycles_commit` or `cycles_release` — never leave reservations dangling. For long-running operations, use `cycles_extend` to heartbeat the reservation TTL so it doesn't expire mid-operation. See [integration patterns](docs/patterns.md) for detailed examples.
+
+## Security Model & Enforcement Boundary
+
+Cycles authority is enforced at two different boundaries, and it matters which one you are relying on.
+
+### Enforced unconditionally (server-side)
+
+Every `cycles_reserve`, `cycles_commit`, and `cycles_decide` call is a *request for authority*, evaluated by the Cycles runtime against the authenticated tenant's policies and current balances. This holds regardless of what the model generates:
+
+- **Malformed amounts never leave the MCP server.** Input schemas reject negative, fractional, or non-numeric amounts, and any value above JavaScript's safe-integer range (2⁵³ − 1), before a request is made.
+- **A well-formed but excessive reservation is refused by the Cycles server** with a `BUDGET_EXCEEDED` error — no reservation ID is issued and nothing is spent. A hallucinated or prompt-injected oversized reserve cannot make Cycles grant more authority than policy allows.
+- **A reservation by itself spends nothing.** Budget only moves on `cycles_commit` (or `cycles_create_event`), and commits are bounded by the reservation plus the configured overage policy.
+
+### Cooperative (inside the agent's tool loop)
+
+This MCP server exposes budget tools *alongside* the host's other tools — it does not sit between the model and those tools. When a reservation is denied, the agent is instructed not to proceed, but nothing in the MCP protocol forces it to. A prompt-injected or misbehaving agent could skip `cycles_reserve` entirely and invoke a consequential tool directly.
+
+### Making enforcement non-bypassable
+
+For the budget check to be a hard gate rather than a convention, put Cycles in the actual dispatch path so the downstream operation cannot execute without a valid reservation:
+
+- **Gate in the host application** — before executing a consequential operation, require a reservation ID and verify it with `cycles_get_reservation`.
+- **Use a dispatch-path integration** — framework middleware that wraps tool execution (e.g. the Cycles Spring Boot starter or LangChain integration) enforces reserve-before-execute in code the model cannot skip.
+- **Meter server-side as a backstop** — where gating isn't possible, record actual usage with `cycles_create_event` so overruns are at least detected and budgets stay accurate.
+
+### Mock mode enforces nothing
+
+With `CYCLES_MOCK=true`, every call returns a synthetic `ALLOW` — it exists for development and demos only. The server refuses to start in mock mode when `NODE_ENV=production` (unless explicitly overridden) precisely so a synthetic `ALLOW` is never mistaken for a real one.
 
 ## Resources
 

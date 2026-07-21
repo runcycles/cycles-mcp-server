@@ -33,6 +33,16 @@ describe("integrate_cycles prompt", () => {
     expect(result.messages[0].content.text).toContain("python");
     expect(result.messages[0].content.text).toContain("api-gateway");
   });
+
+  it("instructs enforcement in the dispatch path, not only via model instructions", async () => {
+    const cb = getPromptCallback("integrate_cycles");
+    const result = await cb({});
+    const text = result.messages[0].content.text;
+    expect(text).toContain("Enforcement boundary");
+    expect(text).toContain("dispatch");
+    expect(text).toContain("unreachable without a successful reservation");
+    expect(text).toContain("cycles_create_event");
+  });
 });
 
 describe("diagnose_overrun prompt", () => {

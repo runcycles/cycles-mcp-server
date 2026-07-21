@@ -35,7 +35,12 @@ Key requirements:
 - Use the correct unit enum: USD_MICROCENTS, TOKENS, CREDITS, or RISK_POINTS.
 - Handle ALLOW_WITH_CAPS by checking the caps object for max_tokens, tool_allowlist, tool_denylist constraints.
 - For long-running operations, use cycles_extend to heartbeat the reservation TTL.
-- Include error handling for BUDGET_EXCEEDED, RESERVATION_EXPIRED, and DEBT_OUTSTANDING errors.`,
+- Include error handling for BUDGET_EXCEEDED, RESERVATION_EXPIRED, and DEBT_OUTSTANDING errors.
+
+Enforcement boundary:
+- Place the reserve check in the code path that dispatches the costly operation (a wrapper, middleware, or gateway), NOT only in instructions to the model. A budget check the model is merely asked to perform can be skipped by a prompt-injected or misbehaving agent; a check in the dispatch path cannot.
+- The generated code MUST make the costly operation unreachable without a successful reservation — e.g. the wrapper obtains the reservation ID and only then executes the operation.
+- Where wrapping the dispatch path is not possible, record actual usage with cycles_create_event as a metering backstop so overruns are still detected.`,
             },
           },
         ],

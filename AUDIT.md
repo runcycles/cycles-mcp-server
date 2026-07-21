@@ -267,3 +267,15 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 **Fix:** Added an npm `overrides` entry forcing `esbuild ^0.28.1` tree-wide; the reinstall resolved esbuild 0.28.1 everywhere and refreshed in-range dev deps (`tsx` 4.23.1, `vitest` 4.1.10 / `vite` 8.1.4). `npm audit` reports 0 vulnerabilities. The override should be removed once `tsup` moves its esbuild range to >= 0.28.
 
 **Verified (2026-07-21):** `npm run build` (tsup on esbuild 0.28.1), full test suite with coverage (98.94% lines / 93.75% branches), `typecheck`, and `lint` all pass.
+
+---
+
+## Enforcement-Boundary Documentation (2026-07-21)
+
+**Files:** `README.md`, `src/prompts/integrate-cycles.ts`, `tests/prompts/prompts.test.ts`. **No protocol-conformance changes** — tool schemas, wire formats, and runtime behavior are unchanged.
+
+**Issue:** The README promised "enforce ... before execution, with zero agent code changes" without documenting the enforcement boundary. In reality, only server-side policy evaluation is unconditional (oversized or malformed reservations cannot grant authority beyond policy; nothing is spent before commit). Honoring a denial *inside the agent's tool loop* is cooperative: this MCP server does not intercept the host's other tools, so a prompt-injected or misbehaving agent could skip `cycles_reserve` and invoke a consequential tool directly. Raised by an external security question (2026-07-21).
+
+**Fix:** Added a "Security Model & Enforcement Boundary" README section distinguishing (a) unconditional server-side enforcement (schema rejection of malformed/unsafe amounts, `BUDGET_EXCEEDED` refusal of excessive reserves, spend-only-on-commit), (b) cooperative in-loop behavior, and (c) how to make enforcement non-bypassable (host-gated dispatch, dispatch-path middleware, `cycles_create_event` metering backstop), plus an explicit "mock mode enforces nothing" note. The `integrate_cycles` prompt now instructs generated integrations to place the reserve check in the dispatch path (wrapper/middleware/gateway) so the costly operation is unreachable without a successful reservation, with `cycles_create_event` as the metering fallback. A regression test asserts the prompt carries this guidance.
+
+**Verified (2026-07-21):** `AmountSchema` (`z.number().int().nonnegative()` under Zod 4) rejects values above `Number.MAX_SAFE_INTEGER` at runtime and advertises `maximum: 9007199254740991` in the generated JSON Schema — no schema change required.
