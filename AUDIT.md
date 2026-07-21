@@ -279,3 +279,13 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 **Fix:** Added a "Security Model & Enforcement Boundary" README section distinguishing (a) unconditional server-side enforcement (schema rejection of malformed/unsafe amounts, `BUDGET_EXCEEDED` refusal of excessive reserves, spend-only-on-commit), (b) cooperative in-loop behavior, and (c) how to make enforcement non-bypassable (host-gated dispatch, dispatch-path middleware, `cycles_create_event` metering backstop), plus an explicit "mock mode enforces nothing" note. The `integrate_cycles` prompt now instructs generated integrations to place the reserve check in the dispatch path (wrapper/middleware/gateway) so the costly operation is unreachable without a successful reservation, with `cycles_create_event` as the metering fallback. A regression test asserts the prompt carries this guidance.
 
 **Verified (2026-07-21):** `AmountSchema` (`z.number().int().nonnegative()` under Zod 4) rejects values above `Number.MAX_SAFE_INTEGER` at runtime and advertises `maximum: 9007199254740991` in the generated JSON Schema — no schema change required.
+
+---
+
+## Publish Pipeline Hardening (2026-07-21)
+
+**Files:** `.github/workflows/ci.yml`, `package.json`, `CHANGELOG.md`. **No runtime changes.**
+
+**Issue:** The v0.3.0 npm publish failed on first attempt with `E404` on PUT — npm's disguise for an expired/invalid token on a scoped package — because the long-lived `NPM_TOKEN` secret had expired since the 0.2.4 release. The release required a manual token rotation and job re-run. Additionally, `npm publish` warned that it auto-corrected `package.json` metadata (`bin` script path, `repository.url` format) on every publish.
+
+**Fix:** The publish job now uses npm Trusted Publishing (OIDC): `NODE_AUTH_TOKEN`/`NPM_TOKEN` removed from the workflow, npm upgraded to latest in the job (OIDC requires npm >= 11.5.1; Node 20 bundles npm 10). The trusted publisher must be configured for `@runcycles/mcp-server` on npmjs.com (GitHub Actions: `runcycles/cycles-mcp-server`, workflow `ci.yml`) before the next tagged release. `package.json` normalized via `npm pkg fix` so publish-time auto-correction warnings stop.

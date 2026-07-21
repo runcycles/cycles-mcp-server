@@ -7,7 +7,7 @@
   "author": "runcycles",
   "repository": {
     "type": "git",
-    "url": "https://github.com/runcycles/cycles-mcp-server.git"
+    "url": "git+https://github.com/runcycles/cycles-mcp-server.git"
   },
   "homepage": "https://github.com/runcycles/cycles-mcp-server#readme",
   "bugs": {
@@ -30,7 +30,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "cycles-mcp-server": "./dist/index.js"
+    "cycles-mcp-server": "dist/index.js"
   },
   "files": [
     "dist",
