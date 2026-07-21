@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 
 ## [Unreleased]
 
+### Added
+
+- All 9 tools now declare MCP tool metadata: display `title`, `annotations` (`cycles_check_balance`, `cycles_list_reservations`, and `cycles_get_reservation` are marked `readOnlyHint: true` so hosts can auto-approve them; all mutating tools are `idempotentHint: true` / `destructiveHint: false`, reflecting the protocol's mandatory idempotency keys; all tools are `openWorldHint: false`), and `outputSchema` derived from the spec response schemas. Successful tool results now include `structuredContent` alongside the existing JSON text content.
+- Post-publish smoke test in CI: after every npm publish, a job installs the just-published version from the registry in a clean directory, performs a real MCP initialize handshake over stdio, verifies all 9 tools and their metadata, and exercises `cycles_check_balance` and `cycles_reserve` in mock mode. The MCP Registry publish and GitHub Release now run only if the smoke test passes.
+
 ### Changed
 
 - npm publish now uses npm Trusted Publishing (OIDC) instead of a long-lived `NPM_TOKEN` secret. The 0.3.0 release failed on first attempt because the token had expired; OIDC removes that failure mode. Requires the trusted publisher to be configured for the package on npmjs.com before the next release.

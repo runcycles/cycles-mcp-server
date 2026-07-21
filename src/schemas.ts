@@ -152,6 +152,144 @@ export const CreateEventInputSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
+// ---------------------------------------------------------------------------
+// Tool output schemas (MCP structuredContent), mirroring the spec response
+// schemas as mapped by the `runcycles` client. Field optionality follows the
+// spec exactly; enum-like status fields stay open strings so additive protocol
+// values never invalidate a response.
+// ---------------------------------------------------------------------------
+
+export const DecisionEnum = z.enum(["ALLOW", "ALLOW_WITH_CAPS", "DENY"]);
+
+const OutputAmountSchema = z.object({
+  unit: z.string(),
+  amount: z.number(),
+});
+
+const OutputSubjectSchema = z.object({
+  tenant: z.string().optional(),
+  workspace: z.string().optional(),
+  app: z.string().optional(),
+  workflow: z.string().optional(),
+  agent: z.string().optional(),
+  toolset: z.string().optional(),
+  dimensions: z.record(z.string(), z.string()).optional(),
+});
+
+const OutputActionSchema = z.object({
+  kind: z.string(),
+  name: z.string(),
+  tags: z.array(z.string()).optional(),
+});
+
+export const CapsSchema = z.object({
+  maxTokens: z.number().optional(),
+  maxStepsRemaining: z.number().optional(),
+  toolAllowlist: z.array(z.string()).optional(),
+  toolDenylist: z.array(z.string()).optional(),
+  cooldownMs: z.number().optional(),
+});
+
+export const BalanceEntrySchema = z.object({
+  scope: z.string(),
+  scopePath: z.string(),
+  remaining: OutputAmountSchema,
+  reserved: OutputAmountSchema.optional(),
+  spent: OutputAmountSchema.optional(),
+  allocated: OutputAmountSchema.optional(),
+  debt: OutputAmountSchema.optional(),
+  overdraftLimit: OutputAmountSchema.optional(),
+  isOverLimit: z.boolean().optional(),
+});
+
+const ReservationSummarySchema = z.object({
+  reservationId: z.string(),
+  status: z.string(),
+  subject: OutputSubjectSchema,
+  action: OutputActionSchema,
+  reserved: OutputAmountSchema,
+  createdAtMs: z.number(),
+  expiresAtMs: z.number(),
+  scopePath: z.string(),
+  affectedScopes: z.array(z.string()),
+  idempotencyKey: z.string().optional(),
+});
+
+export const ReserveOutputSchema = {
+  decision: DecisionEnum,
+  reservationId: z.string().optional(),
+  affectedScopes: z.array(z.string()),
+  expiresAtMs: z.number().optional(),
+  scopePath: z.string().optional(),
+  reserved: OutputAmountSchema.optional(),
+  caps: CapsSchema.optional(),
+  reasonCode: z.string().optional(),
+  retryAfterMs: z.number().optional(),
+  balances: z.array(BalanceEntrySchema).optional(),
+};
+
+export const CommitOutputSchema = {
+  status: z.string(),
+  charged: OutputAmountSchema,
+  released: OutputAmountSchema.optional(),
+  balances: z.array(BalanceEntrySchema).optional(),
+};
+
+export const ReleaseOutputSchema = {
+  status: z.string(),
+  released: OutputAmountSchema,
+  balances: z.array(BalanceEntrySchema).optional(),
+};
+
+export const ExtendOutputSchema = {
+  status: z.string(),
+  expiresAtMs: z.number(),
+  balances: z.array(BalanceEntrySchema).optional(),
+};
+
+export const DecideOutputSchema = {
+  decision: DecisionEnum,
+  caps: CapsSchema.optional(),
+  reasonCode: z.string().optional(),
+  retryAfterMs: z.number().optional(),
+  affectedScopes: z.array(z.string()).optional(),
+};
+
+export const CheckBalanceOutputSchema = {
+  balances: z.array(BalanceEntrySchema),
+  hasMore: z.boolean().optional(),
+  nextCursor: z.string().optional(),
+};
+
+export const ListReservationsOutputSchema = {
+  reservations: z.array(ReservationSummarySchema),
+  hasMore: z.boolean().optional(),
+  nextCursor: z.string().optional(),
+};
+
+export const GetReservationOutputSchema = {
+  reservationId: z.string(),
+  status: z.string(),
+  subject: OutputSubjectSchema,
+  action: OutputActionSchema,
+  reserved: OutputAmountSchema,
+  createdAtMs: z.number(),
+  expiresAtMs: z.number(),
+  scopePath: z.string(),
+  affectedScopes: z.array(z.string()),
+  idempotencyKey: z.string().optional(),
+  committed: OutputAmountSchema.optional(),
+  finalizedAtMs: z.number().optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+};
+
+export const CreateEventOutputSchema = {
+  status: z.string(),
+  eventId: z.string(),
+  charged: OutputAmountSchema.optional(),
+  balances: z.array(BalanceEntrySchema).optional(),
+};
+
 export function validateSubject(subject: Record<string, unknown>): string | null {
   const hasStandardField = SUBJECT_STANDARD_FIELDS.some(
     (f) => subject[f] !== undefined,

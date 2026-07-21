@@ -1,9 +1,25 @@
-import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
+import type { CallToolResult, ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { CyclesApiError } from "../client-adapter.js";
+
+// All Cycles tools talk only to the configured Cycles server (closed domain).
+// Mutating tools require idempotency keys, so repeated identical calls are
+// safe; none of them destroy data.
+export const READ_ONLY_TOOL: ToolAnnotations = {
+  readOnlyHint: true,
+  openWorldHint: false,
+};
+
+export const IDEMPOTENT_WRITE_TOOL: ToolAnnotations = {
+  readOnlyHint: false,
+  destructiveHint: false,
+  idempotentHint: true,
+  openWorldHint: false,
+};
 
 export function toolResult(data: unknown): CallToolResult {
   return {
     content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+    structuredContent: data as Record<string, unknown>,
   };
 }
 

@@ -1,16 +1,22 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
-import { CreateEventInputSchema, validateSubject } from "../schemas.js";
-import { toolResult, toolError } from "./util.js";
+import { CreateEventInputSchema, CreateEventOutputSchema, validateSubject } from "../schemas.js";
+import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerCreateEventTool(
   server: McpServer,
   adapter: ClientAdapter,
 ): void {
-  server.tool(
+  server.registerTool(
     "cycles_create_event",
-    "Record a usage event directly without the reserve/commit lifecycle. Use for fire-and-forget metering of completed operations where pre-estimation is not available. The event is applied atomically to all derived scopes.",
-    CreateEventInputSchema.shape,
+    {
+      title: "Record Usage Event",
+      description:
+        "Record a usage event directly without the reserve/commit lifecycle. Use for fire-and-forget metering of completed operations where pre-estimation is not available. The event is applied atomically to all derived scopes.",
+      inputSchema: CreateEventInputSchema.shape,
+      outputSchema: CreateEventOutputSchema,
+      annotations: IDEMPOTENT_WRITE_TOOL,
+    },
     async (params) => {
       try {
         const subjectError = validateSubject(params.subject);
