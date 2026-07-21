@@ -1,16 +1,22 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
-import { ReserveInputSchema, validateSubject } from "../schemas.js";
-import { toolResult, toolError } from "./util.js";
+import { ReserveInputSchema, ReserveOutputSchema, validateSubject } from "../schemas.js";
+import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerReserveTool(
   server: McpServer,
   adapter: ClientAdapter,
 ): void {
-  server.tool(
+  server.registerTool(
     "cycles_reserve",
-    "Reserve budget before a costly operation (LLM call, tool invocation, external action). Returns a reservation_id to commit or release later. If decision is not ALLOW, do not proceed with the operation. For lightweight preflight checks without reserving, use cycles_decide instead.",
-    ReserveInputSchema.shape,
+    {
+      title: "Reserve Budget",
+      description:
+        "Reserve budget before a costly operation (LLM call, tool invocation, external action). Returns a reservation_id to commit or release later. If decision is not ALLOW, do not proceed with the operation. For lightweight preflight checks without reserving, use cycles_decide instead.",
+      inputSchema: ReserveInputSchema.shape,
+      outputSchema: ReserveOutputSchema,
+      annotations: IDEMPOTENT_WRITE_TOOL,
+    },
     async (params) => {
       try {
         const subjectError = validateSubject(params.subject);

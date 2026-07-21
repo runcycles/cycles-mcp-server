@@ -1,16 +1,22 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
-import { ListReservationsInputSchema } from "../schemas.js";
-import { toolResult, toolError } from "./util.js";
+import { ListReservationsInputSchema, ListReservationsOutputSchema } from "../schemas.js";
+import { toolResult, toolError, READ_ONLY_TOOL } from "./util.js";
 
 export function registerListReservationsTool(
   server: McpServer,
   adapter: ClientAdapter,
 ): void {
-  server.tool(
+  server.registerTool(
     "cycles_list_reservations",
-    "List reservations, optionally filtered by status (ACTIVE, COMMITTED, RELEASED, EXPIRED) or subject fields. Useful for debugging stuck reservations or auditing budget usage.",
-    ListReservationsInputSchema.shape,
+    {
+      title: "List Reservations",
+      description:
+        "List reservations, optionally filtered by status (ACTIVE, COMMITTED, RELEASED, EXPIRED) or subject fields. Useful for debugging stuck reservations or auditing budget usage.",
+      inputSchema: ListReservationsInputSchema.shape,
+      outputSchema: ListReservationsOutputSchema,
+      annotations: READ_ONLY_TOOL,
+    },
     async (params) => {
       try {
         const queryParams: Record<string, string> = {};

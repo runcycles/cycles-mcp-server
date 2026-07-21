@@ -379,3 +379,111 @@ describe("tool error handling", () => {
     expect(body.message).toBe("string error");
   });
 });
+
+describe("tool metadata (titles, annotations, output schemas)", () => {
+  const READ_ONLY = ["cycles_check_balance", "cycles_list_reservations", "cycles_get_reservation"];
+  const WRITES = [
+    "cycles_reserve",
+    "cycles_commit",
+    "cycles_release",
+    "cycles_extend",
+    "cycles_decide",
+    "cycles_create_event",
+  ];
+
+  function getRegisteredTool(name: string): any {
+    return (server as any)._registeredTools[name];
+  }
+
+  it("read-only tools carry readOnlyHint and closed-world hint", () => {
+    for (const name of READ_ONLY) {
+      const tool = getRegisteredTool(name);
+      expect(tool.annotations, name).toEqual({ readOnlyHint: true, openWorldHint: false });
+    }
+  });
+
+  it("mutating tools are marked idempotent and non-destructive", () => {
+    for (const name of WRITES) {
+      const tool = getRegisteredTool(name);
+      expect(tool.annotations, name).toEqual({
+        readOnlyHint: false,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      });
+    }
+  });
+
+  it("every tool has a title and an output schema", () => {
+    for (const name of [...READ_ONLY, ...WRITES]) {
+      const tool = getRegisteredTool(name);
+      expect(tool.title, name).toBeTruthy();
+      expect(tool.outputSchema, name).toBeDefined();
+    }
+  });
+});
+
+describe("structured output", () => {
+  const VALID_PARAMS: Record<string, Record<string, unknown>> = {
+    cycles_reserve: {
+      idempotencyKey: "k1",
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt-4o" },
+      estimate: { unit: "TOKENS", amount: 1000 },
+    },
+    cycles_commit: {
+      reservationId: "rsv_1",
+      idempotencyKey: "k1",
+      actual: { unit: "TOKENS", amount: 850 },
+    },
+    cycles_release: { reservationId: "rsv_1", idempotencyKey: "k1" },
+    cycles_extend: { reservationId: "rsv_1", idempotencyKey: "k1", extendByMs: 60000 },
+    cycles_decide: {
+      idempotencyKey: "k1",
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt-4o" },
+      estimate: { unit: "TOKENS", amount: 1000 },
+    },
+    cycles_check_balance: { tenant: "t1" },
+    cycles_list_reservations: {},
+    cycles_get_reservation: { reservationId: "rsv_1" },
+    cycles_create_event: {
+      idempotencyKey: "k1",
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt-4o" },
+      actual: { unit: "TOKENS", amount: 500 },
+    },
+  };
+
+  it("success results carry structuredContent matching the declared output schema", async () => {
+    const { z } = await import("zod");
+    for (const [name, params] of Object.entries(VALID_PARAMS)) {
+      const tool = (server as any)._registeredTools[name];
+      const result = await tool.handler(params);
+      expect(result.isError, name).toBeUndefined();
+      expect(result.structuredContent, name).toBeDefined();
+      // structuredContent must validate against the tool's own output schema
+      // (the SDK stores it as an already-constructed ZodObject; duck-type
+      // rather than instanceof because the SDK may hold its own zod instance)
+      const schema =
+        typeof tool.outputSchema?.parse === "function"
+          ? tool.outputSchema
+          : z.object(tool.outputSchema);
+      expect(() => schema.parse(result.structuredContent), name).not.toThrow();
+      // text content mirrors structuredContent for clients that read text only
+      expect(JSON.parse(result.content[0].text), name).toEqual(result.structuredContent);
+    }
+  });
+
+  it("error results carry no structuredContent", async () => {
+    const tool = (server as any)._registeredTools["cycles_reserve"];
+    const result = await tool.handler({
+      idempotencyKey: "k1",
+      subject: {},
+      action: { kind: "llm.completion", name: "gpt-4o" },
+      estimate: { unit: "TOKENS", amount: 1000 },
+    });
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toBeUndefined();
+  });
+});

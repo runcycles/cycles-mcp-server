@@ -152,6 +152,148 @@ export const CreateEventInputSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
+// ---------------------------------------------------------------------------
+// Tool output schemas (MCP structuredContent), mirroring the spec response
+// schemas as mapped by the `runcycles` client. Field optionality follows the
+// spec exactly. Two deliberate loosenings so a spec-valid live response can
+// never fail the SDK's structuredContent validation: enum-like status fields
+// stay open strings (additive protocol values), and optional fields are
+// nullish (the runcycles mappers pass scalar wire fields through untouched,
+// so a server emitting explicit JSON nulls for absent fields reaches us as
+// null, not undefined).
+// ---------------------------------------------------------------------------
+
+export const DecisionEnum = z.enum(["ALLOW", "ALLOW_WITH_CAPS", "DENY"]);
+
+const OutputAmountSchema = z.object({
+  unit: z.string(),
+  amount: z.number(),
+});
+
+const OutputSubjectSchema = z.object({
+  tenant: z.string().nullish(),
+  workspace: z.string().nullish(),
+  app: z.string().nullish(),
+  workflow: z.string().nullish(),
+  agent: z.string().nullish(),
+  toolset: z.string().nullish(),
+  dimensions: z.record(z.string(), z.string()).nullish(),
+});
+
+const OutputActionSchema = z.object({
+  kind: z.string(),
+  name: z.string(),
+  tags: z.array(z.string()).nullish(),
+});
+
+export const CapsSchema = z.object({
+  maxTokens: z.number().nullish(),
+  maxStepsRemaining: z.number().nullish(),
+  toolAllowlist: z.array(z.string()).nullish(),
+  toolDenylist: z.array(z.string()).nullish(),
+  cooldownMs: z.number().nullish(),
+});
+
+export const BalanceEntrySchema = z.object({
+  scope: z.string(),
+  scopePath: z.string(),
+  remaining: OutputAmountSchema,
+  reserved: OutputAmountSchema.nullish(),
+  spent: OutputAmountSchema.nullish(),
+  allocated: OutputAmountSchema.nullish(),
+  debt: OutputAmountSchema.nullish(),
+  overdraftLimit: OutputAmountSchema.nullish(),
+  isOverLimit: z.boolean().nullish(),
+});
+
+const ReservationSummarySchema = z.object({
+  reservationId: z.string(),
+  status: z.string(),
+  subject: OutputSubjectSchema,
+  action: OutputActionSchema,
+  reserved: OutputAmountSchema,
+  createdAtMs: z.number(),
+  expiresAtMs: z.number(),
+  scopePath: z.string(),
+  affectedScopes: z.array(z.string()),
+  idempotencyKey: z.string().nullish(),
+});
+
+export const ReserveOutputSchema = {
+  decision: DecisionEnum,
+  reservationId: z.string().nullish(),
+  affectedScopes: z.array(z.string()),
+  expiresAtMs: z.number().nullish(),
+  scopePath: z.string().nullish(),
+  reserved: OutputAmountSchema.nullish(),
+  caps: CapsSchema.nullish(),
+  reasonCode: z.string().nullish(),
+  retryAfterMs: z.number().nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
+};
+
+export const CommitOutputSchema = {
+  status: z.string(),
+  charged: OutputAmountSchema,
+  released: OutputAmountSchema.nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
+};
+
+export const ReleaseOutputSchema = {
+  status: z.string(),
+  released: OutputAmountSchema,
+  balances: z.array(BalanceEntrySchema).nullish(),
+};
+
+export const ExtendOutputSchema = {
+  status: z.string(),
+  expiresAtMs: z.number(),
+  balances: z.array(BalanceEntrySchema).nullish(),
+};
+
+export const DecideOutputSchema = {
+  decision: DecisionEnum,
+  caps: CapsSchema.nullish(),
+  reasonCode: z.string().nullish(),
+  retryAfterMs: z.number().nullish(),
+  affectedScopes: z.array(z.string()).nullish(),
+};
+
+export const CheckBalanceOutputSchema = {
+  balances: z.array(BalanceEntrySchema),
+  hasMore: z.boolean().nullish(),
+  nextCursor: z.string().nullish(),
+};
+
+export const ListReservationsOutputSchema = {
+  reservations: z.array(ReservationSummarySchema),
+  hasMore: z.boolean().nullish(),
+  nextCursor: z.string().nullish(),
+};
+
+export const GetReservationOutputSchema = {
+  reservationId: z.string(),
+  status: z.string(),
+  subject: OutputSubjectSchema,
+  action: OutputActionSchema,
+  reserved: OutputAmountSchema,
+  createdAtMs: z.number(),
+  expiresAtMs: z.number(),
+  scopePath: z.string(),
+  affectedScopes: z.array(z.string()),
+  idempotencyKey: z.string().nullish(),
+  committed: OutputAmountSchema.nullish(),
+  finalizedAtMs: z.number().nullish(),
+  metadata: z.record(z.string(), z.unknown()).nullish(),
+};
+
+export const CreateEventOutputSchema = {
+  status: z.string(),
+  eventId: z.string(),
+  charged: OutputAmountSchema.nullish(),
+  balances: z.array(BalanceEntrySchema).nullish(),
+};
+
 export function validateSubject(subject: Record<string, unknown>): string | null {
   const hasStandardField = SUBJECT_STANDARD_FIELDS.some(
     (f) => subject[f] !== undefined,

@@ -494,3 +494,35 @@ describe("validateBalanceFilter", () => {
     expect(validateBalanceFilter({ limit: "10" })).toBeTruthy();
   });
 });
+
+describe("output schemas tolerate explicit nulls", () => {
+  // The runcycles mappers pass scalar wire fields through untouched, so a
+  // server that serializes absent optional fields as explicit JSON nulls
+  // reaches structuredContent as null. Output schemas must accept that —
+  // .optional() alone rejects null and would fail the SDK's validation of
+  // an otherwise spec-valid response.
+  it("accepts null for absent optional fields in a reserve response", async () => {
+    const { z } = await import("zod");
+    const { ReserveOutputSchema } = await import("../src/schemas.js");
+    const denied = {
+      decision: "DENY",
+      reservationId: null,
+      affectedScopes: [],
+      expiresAtMs: null,
+      scopePath: null,
+      reserved: null,
+      caps: null,
+      reasonCode: "BUDGET_EXCEEDED",
+      retryAfterMs: null,
+      balances: null,
+    };
+    expect(z.object(ReserveOutputSchema).safeParse(denied).success).toBe(true);
+  });
+
+  it("still rejects wrong types", async () => {
+    const { z } = await import("zod");
+    const { ReserveOutputSchema } = await import("../src/schemas.js");
+    const bad = { decision: "MAYBE", affectedScopes: [] };
+    expect(z.object(ReserveOutputSchema).safeParse(bad).success).toBe(false);
+  });
+});
