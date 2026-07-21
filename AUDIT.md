@@ -255,3 +255,15 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 **Issue:** Server metadata and `/health` reported a hardcoded `0.2.0` while `package.json` was `0.2.4`.
 
 **Fix:** Runtime version metadata is loaded from `package.json`, eliminating the duplicate version constant.
+
+---
+
+## Dependency Advisory — esbuild < 0.28.1 (2026-07-21)
+
+**Files:** `package.json`, `package-lock.json`. **No runtime changes** — esbuild is a development-only transitive dependency (via `tsup`, `tsx`, `vitest`/`vite`); nothing ships in `dist/`.
+
+**Issue:** Dependabot alert #26 (low severity): esbuild >= 0.27.3, < 0.28.1 allows arbitrary file read when running the development server on Windows. The lockfile resolved esbuild 0.27.4. No Dependabot PR was raised because no direct dependency range reaches the patched version: `tsup` (even at latest 8.5.1) pins `esbuild ^0.27.0`.
+
+**Fix:** Added an npm `overrides` entry forcing `esbuild ^0.28.1` tree-wide; the reinstall resolved esbuild 0.28.1 everywhere and refreshed in-range dev deps (`tsx` 4.23.1, `vitest` 4.1.10 / `vite` 8.1.4). `npm audit` reports 0 vulnerabilities. The override should be removed once `tsup` moves its esbuild range to >= 0.28.
+
+**Verified (2026-07-21):** `npm run build` (tsup on esbuild 0.28.1), full test suite with coverage (98.94% lines / 93.75% branches), `typecheck`, and `lint` all pass.
