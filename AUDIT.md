@@ -301,3 +301,13 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 **Change 2 — post-publish smoke test.** New CI job between `publish` and `publish-registry`: waits for npm propagation, then `scripts/smoke-test.mjs` installs the just-published tarball via npx from an empty temp directory (spawning from the repo would resolve the local package of the same name/version and silently test the checkout instead of the artifact — verified during development), performs an MCP initialize handshake over stdio, asserts the reported server version, all 9 tools with title/annotations/outputSchema, and exercises `cycles_check_balance` + `cycles_reserve` in mock mode (asserting the `mock_` reservation-id prefix). MCP Registry publish and GitHub Release are now gated on the smoke test.
 
 **Verified (2026-07-21):** 183 tests pass (new suites assert per-tool annotations, titles, output schemas, and that `structuredContent` validates against each tool's own declared schema and mirrors the text content); wire-level check against the built server over real MCP stdio confirmed 9/9 tools serve complete metadata and structured results; smoke script validated against published 0.3.0 (correctly connects, then fails on the metadata assertion that predates this change).
+
+---
+
+## Release Pipeline Fix — Pin npm 11 in Publish Job (2026-07-21)
+
+**Files:** `.github/workflows/ci.yml`. **No runtime changes.**
+
+**Issue:** The v0.4.0 publish failed at `npm install -g npm@latest` with `EBADENGINE`: npm 12.0.1 (current `latest`) requires Node `^22.22.2 || ^24.15.0 || >=26.0.0`, while the publish job runs Node 20. The step existed to get OIDC-capable npm (>= 11.5.1) onto Node 20, and worked while `latest` was 11.x. Nothing was published — the job failed before `npm ci` — so re-tagging v0.4.0 after this fix is clean.
+
+**Fix:** Pin `npm install -g npm@11` (supports Node 20, satisfies the OIDC minimum). The same `npm@latest` pattern exists in the `cycles-client-typescript` and `cycles-openclaw-budget-guard` publish jobs and is being fixed there as well.

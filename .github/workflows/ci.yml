@@ -34,7 +34,9 @@ jobs:
           cache: npm
           registry-url: 'https://registry.npmjs.org'
       # Trusted publishing (OIDC) requires npm >= 11.5.1; Node 20 bundles npm 10.
-      - run: npm install -g npm@latest
+      # Pinned to npm 11: npm 12 dropped Node 20 support, so @latest broke the
+      # v0.4.0 publish with EBADENGINE.
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npm run build
       - run: npm publish --provenance --access public
