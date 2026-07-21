@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.4.0] - 2026-07-21
+
+Tool-metadata and release-pipeline release. Tools now carry MCP titles, annotations, and output schemas — hosts can auto-approve the read-only tools and consume typed `structuredContent`. First release published via npm Trusted Publishing (OIDC) and gated by the post-publish smoke test.
 
 ### Added
 
