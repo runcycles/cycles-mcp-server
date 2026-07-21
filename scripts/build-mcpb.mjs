@@ -15,6 +15,7 @@ import {
   existsSync,
   cpSync,
   rmSync,
+  readdirSync,
 } from "node:fs";
 
 const MCPB_CLI = "@anthropic-ai/mcpb@2.1.2";
@@ -43,22 +44,20 @@ cpSync("docs", "build-mcpb/docs", { recursive: true });
 // bundler strips comments, so the notices must ship as files.
 cpSync("LICENSE", "build-mcpb/LICENSE");
 
-const LICENSE_FILENAMES = [
-  "LICENSE",
-  "LICENSE.md",
-  "LICENSE.txt",
-  "LICENCE",
-  "LICENCE.md",
-  "license",
-  "License.md",
-  "COPYING",
-  "COPYING.md",
-  "LICENSE-MIT",
-  "LICENSE-MIT.txt",
-  "LICENSE-APACHE",
-  "LICENSE.APACHE2",
-  "LICENSE.BSD",
-];
+// Case-insensitive match against actual directory entries: Windows' filesystem
+// masked a fixed-name lookup during development (ms and express-rate-limit
+// ship lowercase `license.md`), and Linux CI then failed on it. Covers
+// LICENSE/LICENCE/COPYING with any extension or -MIT/-APACHE style suffix.
+const LICENSE_PATTERN = /^(licen[cs]e|copying)([-._].*)?$/i;
+
+function findLicenseFile(pkgDir) {
+  try {
+    const entry = readdirSync(pkgDir).find((f) => LICENSE_PATTERN.test(f));
+    return entry ? `${pkgDir}/${entry}` : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const lock = JSON.parse(readFileSync("package-lock.json", "utf8"));
 const notices = ["# Third-Party Notices", "", "This bundle inlines the following packages:", ""];
@@ -69,7 +68,7 @@ for (const [path, info] of Object.entries(lock.packages)) {
   bundled += 1;
   const name = path.replace(/^.*node_modules\//, "");
   notices.push(`---`, ``, `## ${name}@${info.version} (${info.license ?? "unknown license"})`, ``);
-  const licenseFile = LICENSE_FILENAMES.map((f) => `${path}/${f}`).find((f) => existsSync(f));
+  const licenseFile = findLicenseFile(path);
   if (licenseFile) {
     notices.push(readFileSync(licenseFile, "utf8").trim(), "");
   } else {
@@ -78,12 +77,12 @@ for (const [path, info] of Object.entries(lock.packages)) {
 }
 // Hard gate: shipping the bundle without a dependency's license text would
 // silently recreate the compliance problem this file exists to solve. Either
-// the package ships its license under a name not yet in LICENSE_FILENAMES
-// (add it above), or it genuinely ships none (resolve before packing).
+// the package ships its license under a name LICENSE_PATTERN doesn't match
+// (extend the pattern), or it genuinely ships none (resolve before packing).
 if (missing.length > 0) {
   console.error(
     `License text missing for ${missing.length} bundled package(s): ${missing.join(", ")}\n` +
-      "Add the filename to LICENSE_FILENAMES if it exists under another name, or resolve the packaging gap before shipping.",
+      "Extend LICENSE_PATTERN if the file exists under an unmatched name, or resolve the packaging gap before shipping.",
   );
   process.exit(1);
 }
