@@ -4,11 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [0.3.0] - 2026-07-21
+
+Security-hardening release. The minor bump signals two behavior changes that can affect existing deployments: mock mode now refuses to start in production without an explicit override, and blank `MCP_HTTP_AUTH_TOKEN` values now refuse startup instead of silently disabling authentication.
 
 ### Added
 
 - Optional `MCP_HTTP_AUTH_TOKEN` bearer authentication for all Streamable HTTP `/mcp` methods. Configured requests without the exact `Authorization: Bearer <token>` header receive `401 Unauthorized`; stdio transport and `/health` are unchanged.
+- README "Security Model & Enforcement Boundary" section documenting what is enforced unconditionally server-side versus cooperatively in the agent loop, and how to make enforcement non-bypassable via host-gated dispatch or dispatch-path middleware.
+- The `integrate_cycles` prompt now instructs generated integrations to place the reserve check in the dispatch path (wrapper/middleware/gateway) so costly operations are unreachable without a successful reservation.
 
 ### Changed
 
@@ -21,6 +25,7 @@ The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.
 - Mock mode now emits a prominent warning on every startup and is refused when `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is explicitly set.
 - Unauthenticated HTTP startup now emits a prominent warning whenever the bind address is not loopback.
 - Explicitly configured blank or whitespace-only `MCP_HTTP_AUTH_TOKEN` values now refuse startup instead of disabling authentication.
+- Forced transitive `esbuild` to >= 0.28.1 via npm `overrides`, resolving Dependabot alert #26 (low severity, dev-only: arbitrary file read via the esbuild development server on Windows). Remove the override once `tsup` allows esbuild >= 0.28.
 
 ### Fixed
 
