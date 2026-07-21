@@ -95,8 +95,8 @@ try {
   // path resolution differs between source and bundled layouts, and this
   // exact failure shipped silently in 0.1.0 through 0.4.0.
   const doc = await client.readResource({ uri: "cycles://docs/quickstart" });
-  const docText = doc.contents?.[0]?.text ?? "";
-  if (typeof docText !== "string" || docText.includes("not found")) {
+  const docText = String(doc.contents?.[0]?.text ?? "");
+  if (docText.startsWith("Documentation file") || docText.length === 0) {
     fail(`cycles://docs/quickstart returned fallback instead of content: ${JSON.stringify(docText.slice(0, 80))}`);
   }
 

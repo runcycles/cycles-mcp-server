@@ -14,6 +14,7 @@ import {
   mkdirSync,
   existsSync,
   cpSync,
+  rmSync,
 } from "node:fs";
 
 const MCPB_CLI = "@anthropic-ai/mcpb@2.1.2";
@@ -21,6 +22,10 @@ const MCPB_CLI = "@anthropic-ai/mcpb@2.1.2";
 const run = (cmd) => execSync(cmd, { stdio: "inherit" });
 
 const { version } = JSON.parse(readFileSync("package.json", "utf8"));
+
+// Full clean: tsup's `clean` only wipes server/ — stale docs or manifest
+// files from earlier builds would otherwise be packed silently.
+rmSync("build-mcpb", { recursive: true, force: true });
 
 run("npx tsup --config tsup.mcpb.config.ts");
 if (!existsSync("build-mcpb/server/index.cjs")) {
