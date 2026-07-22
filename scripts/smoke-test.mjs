@@ -76,10 +76,11 @@ try {
     fail("cycles_check_balance returned no structuredContent.balances");
   }
 
+  // idempotencyKey deliberately omitted: gates the auto-generation ergonomics
+  // (the server must supply one and the call must still succeed).
   const reserve = await client.callTool({
     name: "cycles_reserve",
     arguments: {
-      idempotencyKey: `smoke-${Date.now()}`,
       subject: { tenant: "smoke-test" },
       action: { kind: "llm.completion", name: "smoke" },
       estimate: { unit: "TOKENS", amount: 100 },
