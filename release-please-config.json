@@ -1,0 +1,23 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "release-type": "node",
+  "include-component-in-tag": false,
+  "last-release-sha": "1d7ecf11ddb1015a8e8353a30ca3a3b951739474",
+  "packages": {
+    ".": {
+      "changelog-sections": [
+        { "type": "feat", "section": "Added" },
+        { "type": "fix", "section": "Fixed" },
+        { "type": "perf", "section": "Changed" },
+        { "type": "refactor", "section": "Changed" },
+        { "type": "docs", "section": "Documentation", "hidden": false },
+        { "type": "chore", "section": "Maintenance", "hidden": true }
+      ],
+      "extra-files": [
+        { "type": "json", "path": "server.json", "jsonpath": "$.version" },
+        { "type": "json", "path": "server.json", "jsonpath": "$.packages[0].version" },
+        { "type": "generic", "path": "AUDIT.md" }
+      ]
+    }
+  }
+}

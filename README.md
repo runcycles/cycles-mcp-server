@@ -257,16 +257,16 @@ The server is published to two registries:
 | **npm** | `@runcycles/mcp-server` | CI publishes on `v*` tag push with provenance |
 | **MCP Registry** | `io.github.runcycles/cycles-mcp-server` | CI publishes the `server.json` manifest after npm |
 
-To release a new version:
+Releases are automated with [release-please](https://github.com/googleapis/release-please). PRs are **squash-merged** (repo enforces squash-only) with **conventional PR titles** (`feat:`, `fix:`, …) — the PR title becomes the single commit on `main` that release-please reads. It maintains a release PR that accumulates the changelog and bumps the version in `package.json`, `server.json` (both fields), and the `AUDIT.md` header. **Merging the release PR** creates the tag and GitHub release, then dispatches the publish pipeline.
+
+CI runs on the tag: test (Node 20+22) → npm publish (Trusted Publishing/OIDC, with provenance) → smoke test against the published tarball → MCP Registry publish → MCPB desktop-extension bundle attached to the GitHub release.
+
+Manual fallback (works unchanged): bump versions yourself, then tag and push:
 
 ```bash
-# 1. Update version in package.json and server.json
-# 2. Commit, tag, and push
-git tag v0.1.0
-git push origin v0.1.0
+git tag v0.5.0
+git push origin v0.5.0
 ```
-
-CI runs: test (Node 20+22) → npm publish → MCP Registry publish.
 
 ## Documentation
 
