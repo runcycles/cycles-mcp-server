@@ -141,7 +141,7 @@ export CYCLES_DEFAULT_AGENT=
 export CYCLES_DEFAULT_TOOLSET=
 ```
 
-Agent-ergonomics behavior: explicit subject fields always win over `CYCLES_DEFAULT_*` values, and `cycles_check_balance` accepts an empty call when defaults supply a filter. `idempotencyKey` remains **required on every mutating tool** — same-key replay is the protocol's retry deduplication and evidence-suppression mechanism, and only the caller can hold a key stable across retries. Responses carry plain-text hints after the JSON payload when the budget is under pressure (DENY, `ALLOW_WITH_CAPS`, or under ~15% remaining), so agents self-regulate without host support. Explicit subject fields always win over `CYCLES_DEFAULT_*` values. Responses carry plain-text hints after the JSON payload when the budget is under pressure (DENY, `ALLOW_WITH_CAPS`, or under ~15% remaining), so agents self-regulate without host support.
+Agent-ergonomics behavior: explicit subject fields always win over `CYCLES_DEFAULT_*` values, and `cycles_check_balance` accepts an empty call when defaults supply a filter. `idempotencyKey` remains **required on every mutating tool** — same-key replay is the protocol's retry deduplication and evidence-suppression mechanism, and only the caller can hold a key stable across retries. Responses carry plain-text hints after the JSON payload when the budget is under pressure (DENY, `ALLOW_WITH_CAPS`, or under ~15% remaining), so agents self-regulate without host support.
 
 Mock mode prints a prominent warning on every startup, and generated mock reservation/event IDs begin with `mock_`. The server refuses to start with `CYCLES_MOCK=true` and `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is also set.
 
