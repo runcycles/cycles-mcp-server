@@ -19,13 +19,16 @@ export const IDEMPOTENT_WRITE_TOOL: ToolAnnotations = {
 };
 
 // The protocol requires an idempotency key on every mutating call. The MCP
-// input schema makes it optional ONLY where a fresh key on retry cannot
-// double-apply budget effects: decide (no persistent effect), commit/release
-// (spec-mandated RESERVATION_FINALIZED protects re-finalization), extend
-// (server-capped via MAX_EXTENSIONS_EXCEEDED). cycles_reserve and
-// cycles_create_event keep caller-supplied keys REQUIRED — there the key is
-// the only dedup for new budget effects, and a generated key would turn a
-// retry into a duplicate hold or a double charge.
+// input schema makes it optional ONLY for cycles_commit and cycles_release:
+// their fresh-key retries hit the spec-mandated 409 RESERVATION_FINALIZED —
+// loud failure, no duplicate effect, and the retry is recorded as an error
+// artifact rather than a duplicate lifecycle claim. Everything else keeps
+// caller-supplied keys REQUIRED: reserve/create_event (the key is the only
+// dedup for new budget effects — duplicate hold / double charge), extend
+// (a fresh-key retry double-extends and burns extension quota; the
+// MAX_EXTENSIONS cap is quota, not dedup), and decide (each decide emits a
+// signed evidence artifact — only a same-key replay suppresses duplicate
+// emission).
 export function ensureIdempotencyKey(key: string | undefined): string {
   return key ?? `mcp_${randomUUID()}`;
 }

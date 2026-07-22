@@ -489,16 +489,12 @@ describe("structured output", () => {
 });
 
 describe("agent ergonomics", () => {
-  it("generates a mcp_-prefixed idempotency key when omitted (decide — retry-safe)", async () => {
-    const spy = vi.spyOn(adapter, "decide");
-    const tool = (server as any)._registeredTools["cycles_decide"];
-    const result = await tool.handler({
-      subject: { tenant: "t1" },
-      action: { kind: "llm.completion", name: "gpt" },
-      estimate: { unit: "TOKENS", amount: 100 },
-    });
+  it("generates a mcp_-prefixed idempotency key when omitted (release — state-machine protected)", async () => {
+    const spy = vi.spyOn(adapter, "releaseReservation");
+    const tool = (server as any)._registeredTools["cycles_release"];
+    const result = await tool.handler({ reservationId: "rsv_1" });
     expect(result.isError).toBeUndefined();
-    expect(spy.mock.calls[0][0].idempotencyKey).toMatch(/^mcp_[0-9a-f-]{36}$/);
+    expect(spy.mock.calls[0][1].idempotencyKey).toMatch(/^mcp_[0-9a-f-]{36}$/);
   });
 
   it("passes an explicit idempotency key through unchanged", async () => {
@@ -536,6 +532,7 @@ describe("agent ergonomics", () => {
       const spy = vi.spyOn(adapter, "decide");
       const tool = (server as any)._registeredTools["cycles_decide"];
       await tool.handler({
+        idempotencyKey: "k-exp",
         subject: { tenant: "explicit-tenant" },
         action: { kind: "llm.completion", name: "gpt" },
         estimate: { unit: "TOKENS", amount: 100 },
@@ -562,6 +559,7 @@ describe("agent ergonomics", () => {
     try {
       const tool = (server as any)._registeredTools["cycles_decide"];
       const result = await tool.handler({
+        idempotencyKey: "k-big",
         action: { kind: "llm.completion", name: "gpt" },
         estimate: { unit: "TOKENS", amount: 100 },
       });
@@ -606,6 +604,7 @@ describe("budget-pressure hints", () => {
     });
     const tool = (server as any)._registeredTools["cycles_decide"];
     const result = await tool.handler({
+      idempotencyKey: "k-deny",
       subject: { tenant: "t1" },
       action: { kind: "llm.completion", name: "gpt" },
       estimate: { unit: "TOKENS", amount: 100 },
@@ -624,6 +623,7 @@ describe("budget-pressure hints", () => {
     });
     const tool = (server as any)._registeredTools["cycles_decide"];
     const result = await tool.handler({
+      idempotencyKey: "k-caps",
       subject: { tenant: "t1" },
       action: { kind: "llm.completion", name: "gpt" },
       estimate: { unit: "TOKENS", amount: 100 },

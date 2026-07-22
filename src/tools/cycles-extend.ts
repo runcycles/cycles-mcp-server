@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { ExtendInputSchema, ExtendOutputSchema } from "../schemas.js";
-import { toolResult, toolError, ensureIdempotencyKey, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerExtendTool(
   server: McpServer,
@@ -22,7 +22,7 @@ export function registerExtendTool(
         const response = await adapter.extendReservation(
           params.reservationId,
           {
-            idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+            idempotencyKey: params.idempotencyKey,
             extendByMs: params.extendByMs,
             metadata: params.metadata,
           },

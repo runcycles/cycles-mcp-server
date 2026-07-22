@@ -99,13 +99,13 @@ export const ReleaseInputSchema = z.object({
 
 export const ExtendInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   extendByMs: z.number().int().min(1).max(86400000),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const DecideInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   estimate: AmountSchema,

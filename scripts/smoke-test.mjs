@@ -76,19 +76,6 @@ try {
     fail("cycles_check_balance returned no structuredContent.balances");
   }
 
-  // decide with idempotencyKey omitted: gates the auto-generation ergonomics
-  // on a retry-safe tool (reserve/create_event keep keys required by design).
-  const decide = await client.callTool({
-    name: "cycles_decide",
-    arguments: {
-      subject: { tenant: "smoke-test" },
-      action: { kind: "llm.completion", name: "smoke" },
-      estimate: { unit: "TOKENS", amount: 100 },
-    },
-  });
-  if (decide.isError) fail(`cycles_decide (no key) errored: ${JSON.stringify(decide.content)}`);
-  if (!decide.structuredContent?.decision) fail("cycles_decide returned no decision");
-
   const reserve = await client.callTool({
     name: "cycles_reserve",
     arguments: {
@@ -103,6 +90,15 @@ try {
   if (typeof reservationId !== "string" || !reservationId.startsWith("mock_")) {
     fail(`expected mock_ reservation id, got: ${String(reservationId)}`);
   }
+
+  // release with idempotencyKey omitted: gates key auto-generation on a tool
+  // where fresh-key retries are state-machine protected (commit/release only).
+  const release = await client.callTool({
+    name: "cycles_release",
+    arguments: { reservationId },
+  });
+  if (release.isError) fail(`cycles_release (no key) errored: ${JSON.stringify(release.content)}`);
+  if (release.structuredContent?.status !== "RELEASED") fail("cycles_release did not return RELEASED");
 
   // Docs resources must serve real content from the published tarball —
   // path resolution differs between source and bundled layouts, and this
