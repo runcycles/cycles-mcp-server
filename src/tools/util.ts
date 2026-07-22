@@ -18,9 +18,14 @@ export const IDEMPOTENT_WRITE_TOOL: ToolAnnotations = {
   openWorldHint: false,
 };
 
-// The protocol requires an idempotency key on every mutating call; the MCP
-// input schema makes it optional and we generate one here, so the model
-// never has to invent identifiers. The wire request stays spec-conformant.
+// The protocol requires an idempotency key on every mutating call. The MCP
+// input schema makes it optional ONLY where a fresh key on retry cannot
+// double-apply budget effects: decide (no persistent effect), commit/release
+// (spec-mandated RESERVATION_FINALIZED protects re-finalization), extend
+// (server-capped via MAX_EXTENSIONS_EXCEEDED). cycles_reserve and
+// cycles_create_event keep caller-supplied keys REQUIRED — there the key is
+// the only dedup for new budget effects, and a generated key would turn a
+// retry into a duplicate hold or a double charge.
 export function ensureIdempotencyKey(key: string | undefined): string {
   return key ?? `mcp_${randomUUID()}`;
 }
@@ -36,15 +41,25 @@ const SUBJECT_ENV_DEFAULTS: Record<(typeof SUBJECT_STANDARD_FIELDS)[number], str
 
 // Operator-configured subject defaults (CYCLES_DEFAULT_*): fill any standard
 // field the caller left unset. Explicit fields always win; dimensions are
-// never defaulted.
+// never defaulted. Env values bypass the Zod input schema, so they get the
+// same constraints here (non-blank, <=128 chars) — a bad default is an
+// operator config error and must fail loudly, not reach the wire.
 export function applySubjectDefaults<T extends Record<string, unknown>>(
   subject: T | undefined,
 ): Record<string, unknown> {
   const merged: Record<string, unknown> = { ...(subject ?? {}) };
   for (const field of SUBJECT_STANDARD_FIELDS) {
     if (merged[field] === undefined) {
-      const value = process.env[SUBJECT_ENV_DEFAULTS[field]];
-      if (value) merged[field] = value;
+      const envVar = SUBJECT_ENV_DEFAULTS[field];
+      const value = process.env[envVar];
+      if (value !== undefined && value !== "") {
+        if (value.trim() === "" || value.length > 128) {
+          throw new Error(
+            `Invalid ${envVar}: must be 1-128 characters and not whitespace-only (matching the subject schema constraints).`,
+          );
+        }
+        merged[field] = value;
+      }
     }
   }
   return merged;

@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { CreateEventInputSchema, CreateEventOutputSchema, validateSubject } from "../schemas.js";
-import { toolResult, toolError, ensureIdempotencyKey, applySubjectDefaults, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, applySubjectDefaults, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerCreateEventTool(
   server: McpServer,
@@ -24,7 +24,7 @@ export function registerCreateEventTool(
         if (subjectError) return toolError(new Error(subjectError));
 
         const response = await adapter.createEvent({
-          idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+          idempotencyKey: params.idempotencyKey,
           subject,
           action: params.action,
           actual: params.actual,

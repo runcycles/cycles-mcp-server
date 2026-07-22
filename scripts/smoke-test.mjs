@@ -76,11 +76,23 @@ try {
     fail("cycles_check_balance returned no structuredContent.balances");
   }
 
-  // idempotencyKey deliberately omitted: gates the auto-generation ergonomics
-  // (the server must supply one and the call must still succeed).
+  // decide with idempotencyKey omitted: gates the auto-generation ergonomics
+  // on a retry-safe tool (reserve/create_event keep keys required by design).
+  const decide = await client.callTool({
+    name: "cycles_decide",
+    arguments: {
+      subject: { tenant: "smoke-test" },
+      action: { kind: "llm.completion", name: "smoke" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    },
+  });
+  if (decide.isError) fail(`cycles_decide (no key) errored: ${JSON.stringify(decide.content)}`);
+  if (!decide.structuredContent?.decision) fail("cycles_decide returned no decision");
+
   const reserve = await client.callTool({
     name: "cycles_reserve",
     arguments: {
+      idempotencyKey: `smoke-${version}`,
       subject: { tenant: "smoke-test" },
       action: { kind: "llm.completion", name: "smoke" },
       estimate: { unit: "TOKENS", amount: 100 },

@@ -489,9 +489,9 @@ describe("structured output", () => {
 });
 
 describe("agent ergonomics", () => {
-  it("generates a mcp_-prefixed idempotency key when omitted", async () => {
-    const spy = vi.spyOn(adapter, "createReservation");
-    const tool = (server as any)._registeredTools["cycles_reserve"];
+  it("generates a mcp_-prefixed idempotency key when omitted (decide — retry-safe)", async () => {
+    const spy = vi.spyOn(adapter, "decide");
+    const tool = (server as any)._registeredTools["cycles_decide"];
     const result = await tool.handler({
       subject: { tenant: "t1" },
       action: { kind: "llm.completion", name: "gpt" },
@@ -519,6 +519,7 @@ describe("agent ergonomics", () => {
       const spy = vi.spyOn(adapter, "createReservation");
       const tool = (server as any)._registeredTools["cycles_reserve"];
       const result = await tool.handler({
+        idempotencyKey: "k-env",
         action: { kind: "llm.completion", name: "gpt" },
         estimate: { unit: "TOKENS", amount: 100 },
       });
@@ -548,11 +549,39 @@ describe("agent ergonomics", () => {
   it("still rejects when no subject and no env defaults", async () => {
     const tool = (server as any)._registeredTools["cycles_reserve"];
     const result = await tool.handler({
+      idempotencyKey: "k-nodef",
       action: { kind: "llm.completion", name: "gpt" },
       estimate: { unit: "TOKENS", amount: 100 },
     });
     expect(result.isError).toBe(true);
     expect(JSON.parse(result.content[0].text).message).toContain("CYCLES_DEFAULT_");
+  });
+
+  it("rejects oversized env defaults with a named error", async () => {
+    vi.stubEnv("CYCLES_DEFAULT_TENANT", "x".repeat(129));
+    try {
+      const tool = (server as any)._registeredTools["cycles_decide"];
+      const result = await tool.handler({
+        action: { kind: "llm.completion", name: "gpt" },
+        estimate: { unit: "TOKENS", amount: 100 },
+      });
+      expect(result.isError).toBe(true);
+      expect(JSON.parse(result.content[0].text).message).toContain("CYCLES_DEFAULT_TENANT");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("rejects whitespace-only env defaults", async () => {
+    vi.stubEnv("CYCLES_DEFAULT_TENANT", "   ");
+    try {
+      const tool = (server as any)._registeredTools["cycles_check_balance"];
+      const result = await tool.handler({});
+      expect(result.isError).toBe(true);
+      expect(JSON.parse(result.content[0].text).message).toContain("CYCLES_DEFAULT_TENANT");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("cycles_check_balance works with only env-default filters", async () => {

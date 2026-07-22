@@ -72,7 +72,7 @@ export const MetricsObjectSchema = z.object({
 // --- Per-tool input schemas (ZodObjects, no refine, so .shape works) ---
 
 export const ReserveInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   estimate: AmountSchema,
@@ -142,7 +142,7 @@ export const GetReservationInputSchema = z.object({
 });
 
 export const CreateEventInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   actual: AmountSchema,

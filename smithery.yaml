@@ -17,6 +17,30 @@ startCommand:
         title: Mock mode (evaluation only — no enforcement)
         description: Return synthetic ALLOW responses without contacting a Cycles server.
         default: false
+      defaultTenant:
+        type: string
+        title: Default tenant
+        description: Optional default merged into tool calls that omit the subject.
+      defaultWorkspace:
+        type: string
+        title: Default workspace
+        description: Optional default merged into tool calls that omit the subject.
+      defaultApp:
+        type: string
+        title: Default app
+        description: Optional default merged into tool calls that omit the subject.
+      defaultWorkflow:
+        type: string
+        title: Default workflow
+        description: Optional default merged into tool calls that omit the subject.
+      defaultAgent:
+        type: string
+        title: Default agent
+        description: Optional default merged into tool calls that omit the subject.
+      defaultToolset:
+        type: string
+        title: Default toolset
+        description: Optional default merged into tool calls that omit the subject.
   commandFunction: |-
     (config) => ({
       command: 'node',
@@ -24,6 +48,12 @@ startCommand:
       env: {
         CYCLES_BASE_URL: config.cyclesBaseUrl || '',
         CYCLES_API_KEY: config.cyclesApiKey || '',
-        CYCLES_MOCK: config.cyclesMock ? 'true' : 'false'
+        CYCLES_MOCK: config.cyclesMock ? 'true' : 'false',
+        CYCLES_DEFAULT_TENANT: config.defaultTenant || '',
+        CYCLES_DEFAULT_WORKSPACE: config.defaultWorkspace || '',
+        CYCLES_DEFAULT_APP: config.defaultApp || '',
+        CYCLES_DEFAULT_WORKFLOW: config.defaultWorkflow || '',
+        CYCLES_DEFAULT_AGENT: config.defaultAgent || '',
+        CYCLES_DEFAULT_TOOLSET: config.defaultToolset || ''
       }
     })

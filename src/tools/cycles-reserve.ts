@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { ReserveInputSchema, ReserveOutputSchema, validateSubject } from "../schemas.js";
-import { toolResult, toolError, ensureIdempotencyKey, applySubjectDefaults, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, applySubjectDefaults, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerReserveTool(
   server: McpServer,
@@ -24,7 +24,7 @@ export function registerReserveTool(
         if (subjectError) return toolError(new Error(subjectError));
 
         const response = await adapter.createReservation({
-          idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+          idempotencyKey: params.idempotencyKey,
           subject,
           action: params.action,
           estimate: params.estimate,
