@@ -489,15 +489,7 @@ describe("structured output", () => {
 });
 
 describe("agent ergonomics", () => {
-  it("generates a mcp_-prefixed idempotency key when omitted (release — state-machine protected)", async () => {
-    const spy = vi.spyOn(adapter, "releaseReservation");
-    const tool = (server as any)._registeredTools["cycles_release"];
-    const result = await tool.handler({ reservationId: "rsv_1" });
-    expect(result.isError).toBeUndefined();
-    expect(spy.mock.calls[0][1].idempotencyKey).toMatch(/^mcp_[0-9a-f-]{36}$/);
-  });
-
-  it("passes an explicit idempotency key through unchanged", async () => {
+  it("passes the idempotency key through unchanged", async () => {
     const spy = vi.spyOn(adapter, "commitReservation");
     const tool = (server as any)._registeredTools["cycles_commit"];
     await tool.handler({

@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import type { CallToolResult, ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { CyclesApiError } from "../client-adapter.js";
 import { SUBJECT_STANDARD_FIELDS } from "../schemas.js";
@@ -18,20 +17,14 @@ export const IDEMPOTENT_WRITE_TOOL: ToolAnnotations = {
   openWorldHint: false,
 };
 
-// The protocol requires an idempotency key on every mutating call. The MCP
-// input schema makes it optional ONLY for cycles_commit and cycles_release:
-// their fresh-key retries hit the spec-mandated 409 RESERVATION_FINALIZED —
-// loud failure, no duplicate effect, and the retry is recorded as an error
-// artifact rather than a duplicate lifecycle claim. Everything else keeps
-// caller-supplied keys REQUIRED: reserve/create_event (the key is the only
-// dedup for new budget effects — duplicate hold / double charge), extend
-// (a fresh-key retry double-extends and burns extension quota; the
-// MAX_EXTENSIONS cap is quota, not dedup), and decide (each decide emits a
-// signed evidence artifact — only a same-key replay suppresses duplicate
-// emission).
-export function ensureIdempotencyKey(key: string | undefined): string {
-  return key ?? `mcp_${randomUUID()}`;
-}
+// Idempotency keys are caller-supplied and REQUIRED on every mutating tool.
+// Auto-generation was implemented and then fully removed through review: a
+// generated key turns any retry into a non-idempotent operation — duplicate
+// holds/charges (reserve, create_event), double-extension (extend), or
+// duplicate signed evidence artifacts (decide, and even the 409 error
+// artifacts on commit/release replays) — contradicting idempotentHint: true.
+// Same-key replay is the protocol's dedup AND evidence-suppression mechanism;
+// only the caller can hold a key stable across retries.
 
 const SUBJECT_ENV_DEFAULTS: Record<(typeof SUBJECT_STANDARD_FIELDS)[number], string> = {
   tenant: "CYCLES_DEFAULT_TENANT",

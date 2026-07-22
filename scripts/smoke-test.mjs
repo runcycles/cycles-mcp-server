@@ -91,11 +91,9 @@ try {
     fail(`expected mock_ reservation id, got: ${String(reservationId)}`);
   }
 
-  // release with idempotencyKey omitted: gates key auto-generation on a tool
-  // where fresh-key retries are state-machine protected (commit/release only).
   const release = await client.callTool({
     name: "cycles_release",
-    arguments: { reservationId },
+    arguments: { reservationId, idempotencyKey: `smoke-rel-${version}` },
   });
   if (release.isError) fail(`cycles_release (no key) errored: ${JSON.stringify(release.content)}`);
   if (release.structuredContent?.status !== "RELEASED") fail("cycles_release did not return RELEASED");

@@ -85,7 +85,7 @@ export const ReserveInputSchema = z.object({
 
 export const CommitInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   actual: AmountSchema,
   metrics: MetricsObjectSchema.optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
@@ -93,7 +93,7 @@ export const CommitInputSchema = z.object({
 
 export const ReleaseInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256).optional(),
+  idempotencyKey: z.string().min(1).max(256),
   reason: z.string().max(256).optional(),
 });
 

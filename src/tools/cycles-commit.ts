@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { CommitInputSchema, CommitOutputSchema } from "../schemas.js";
-import { toolResult, toolError, ensureIdempotencyKey, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerCommitTool(
   server: McpServer,
@@ -22,7 +22,7 @@ export function registerCommitTool(
         const response = await adapter.commitReservation(
           params.reservationId,
           {
-            idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+            idempotencyKey: params.idempotencyKey,
             actual: params.actual,
             metrics: params.metrics ?? undefined,
             metadata: params.metadata,

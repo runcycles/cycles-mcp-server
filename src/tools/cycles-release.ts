@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { ReleaseInputSchema, ReleaseOutputSchema } from "../schemas.js";
-import { toolResult, toolError, ensureIdempotencyKey, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerReleaseTool(
   server: McpServer,
@@ -22,7 +22,7 @@ export function registerReleaseTool(
         const response = await adapter.releaseReservation(
           params.reservationId,
           {
-            idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+            idempotencyKey: params.idempotencyKey,
             reason: params.reason,
           },
         );
