@@ -350,3 +350,13 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 
 - **fast-uri (2 high) and hono (3 medium):** resolved by Dependabot PRs #153 (fast-uri 3.1.4) and #154 (hono 4.12.31), both lockfile-only, squash-merged after green CI.
 - **@hono/node-server < 2.0.5 (medium, GHSA-frvp-7c67-39w9) — dismissed as `not_used`:** the vulnerable function is `serveStatic` (path traversal on Windows via encoded backslash when serving static files). Verified unreachable: the SDK's runtime JS contains no `serveStatic` call (the only "serve-static" matches are express *type declarations*), and this server's HTTP transport is express-based, serving only `/mcp` and `/health` — no static file serving exists in the process. The only patched version is 2.0.5, a major bump outside the SDK's `^1.19.9` range; overriding a major for unreachable code would add regression risk to the streamable HTTP transport for zero security gain. `npm audit` will continue to flag it locally (audit output cannot express reachability); the GitHub alert is dismissed with this justification. **Revisit when `@modelcontextprotocol/sdk` adopts `@hono/node-server` 2.x.**
+
+---
+
+## Directory Listings — Dockerfile, Smithery config (2026-07-22)
+
+**Files:** `Dockerfile`, `.dockerignore`, `smithery.yaml`. **No runtime changes** (`glama.json` already existed with the correct maintainer claim).
+
+Distribution-channel artifacts for the listings sweep: a multi-stage `node:20-alpine` image (npm pinned to 11 in the build stage — npm 10.8 hit the "Exit handler never called" bug during `npm ci`; docs/ copied next to dist/ so the `cycles://docs/*` resources resolve; `NODE_ENV=production` at runtime, stdio entrypoint) and a Smithery `startCommand` config mapping `cyclesBaseUrl`/`cyclesApiKey`/`cyclesMock` onto the standard env vars.
+
+**Verified:** image builds (224 MB) and passes a full MCP wire check over `docker run -i` — version 0.5.0, 9/9 tools metadata-complete, quickstart resource serves real content, mock reserve returns a `mock_`-prefixed ALLOW. Note the mock-mode production guard fires inside the image (it sets `NODE_ENV=production`), so mock evaluation in Docker requires the explicit `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` override — working as designed.

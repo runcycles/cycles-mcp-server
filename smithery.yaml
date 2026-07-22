@@ -1,0 +1,29 @@
+# Smithery configuration — https://smithery.ai/docs/config#smitheryyaml
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      cyclesBaseUrl:
+        type: string
+        title: Cycles Server URL
+        description: URL of your Cycles server, e.g. https://api.runcycles.io. Not needed in mock mode.
+      cyclesApiKey:
+        type: string
+        title: Cycles API Key
+        description: API key for your Cycles server. Not needed in mock mode.
+      cyclesMock:
+        type: boolean
+        title: Mock mode (evaluation only — no enforcement)
+        description: Return synthetic ALLOW responses without contacting a Cycles server.
+        default: false
+  commandFunction: |-
+    (config) => ({
+      command: 'node',
+      args: ['dist/index.js'],
+      env: {
+        CYCLES_BASE_URL: config.cyclesBaseUrl || '',
+        CYCLES_API_KEY: config.cyclesApiKey || '',
+        CYCLES_MOCK: config.cyclesMock ? 'true' : 'false'
+      }
+    })

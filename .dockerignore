@@ -1,0 +1,12 @@
+node_modules
+dist
+dist-mcpb
+build-mcpb
+coverage
+.git
+.github
+tests
+scripts
+mcpb
+*.md
+!README.md
