@@ -72,8 +72,8 @@ export const MetricsObjectSchema = z.object({
 // --- Per-tool input schemas (ZodObjects, no refine, so .shape works) ---
 
 export const ReserveInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256),
-  subject: SubjectObjectSchema,
+  idempotencyKey: z.string().min(1).max(256).optional(),
+  subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   estimate: AmountSchema,
   ttlMs: z.number().int().min(1000).max(86400000).optional(),
@@ -85,7 +85,7 @@ export const ReserveInputSchema = z.object({
 
 export const CommitInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256),
+  idempotencyKey: z.string().min(1).max(256).optional(),
   actual: AmountSchema,
   metrics: MetricsObjectSchema.optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
@@ -93,20 +93,20 @@ export const CommitInputSchema = z.object({
 
 export const ReleaseInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256),
+  idempotencyKey: z.string().min(1).max(256).optional(),
   reason: z.string().max(256).optional(),
 });
 
 export const ExtendInputSchema = z.object({
   reservationId: z.string().min(1).max(128),
-  idempotencyKey: z.string().min(1).max(256),
+  idempotencyKey: z.string().min(1).max(256).optional(),
   extendByMs: z.number().int().min(1).max(86400000),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const DecideInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256),
-  subject: SubjectObjectSchema,
+  idempotencyKey: z.string().min(1).max(256).optional(),
+  subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   estimate: AmountSchema,
   metadata: z.record(z.string(), z.unknown()).optional(),
@@ -142,8 +142,8 @@ export const GetReservationInputSchema = z.object({
 });
 
 export const CreateEventInputSchema = z.object({
-  idempotencyKey: z.string().min(1).max(256),
-  subject: SubjectObjectSchema,
+  idempotencyKey: z.string().min(1).max(256).optional(),
+  subject: SubjectObjectSchema.optional(),
   action: ActionSchema,
   actual: AmountSchema,
   overagePolicy: CommitOveragePolicyEnum.optional(),
@@ -299,7 +299,7 @@ export function validateSubject(subject: Record<string, unknown>): string | null
     (f) => subject[f] !== undefined,
   );
   if (!hasStandardField) {
-    return "Subject must have at least one standard field (tenant, workspace, app, workflow, agent, or toolset)";
+    return "Subject must have at least one standard field (tenant, workspace, app, workflow, agent, or toolset). Provide one in the call or configure CYCLES_DEFAULT_* environment defaults.";
   }
   return null;
 }
@@ -309,7 +309,7 @@ export function validateBalanceFilter(params: Record<string, unknown>): string |
     (f) => params[f] !== undefined,
   );
   if (!hasFilter) {
-    return "At least one subject filter (tenant, workspace, app, workflow, agent, or toolset) is required";
+    return "At least one subject filter (tenant, workspace, app, workflow, agent, or toolset) is required. Provide one in the call or configure CYCLES_DEFAULT_* environment defaults.";
   }
   return null;
 }

@@ -130,7 +130,18 @@ export CYCLES_ALLOW_MOCK_IN_PRODUCTION=false  # must be true to use mock mode wi
 export PORT=3000                               # optional, for HTTP transport
 export HOST=127.0.0.1                          # optional HTTP bind address; unset binds all interfaces
 export MCP_HTTP_AUTH_TOKEN=replace-me          # optional bearer token required on /mcp when set
+
+# Optional subject defaults — merged into any tool call that omits the field,
+# so agents can call cycles_reserve with just an action and amount:
+export CYCLES_DEFAULT_TENANT=acme
+export CYCLES_DEFAULT_WORKSPACE=prod
+export CYCLES_DEFAULT_APP=support-bot
+export CYCLES_DEFAULT_WORKFLOW=
+export CYCLES_DEFAULT_AGENT=
+export CYCLES_DEFAULT_TOOLSET=
 ```
+
+Agent-ergonomics behavior: `idempotencyKey` may be omitted on any mutating tool — the server generates one (`mcp_<uuid>`), and the wire request stays protocol-conformant. Explicit subject fields always win over `CYCLES_DEFAULT_*` values. Responses carry plain-text hints after the JSON payload when the budget is under pressure (DENY, `ALLOW_WITH_CAPS`, or under ~15% remaining), so agents self-regulate without host support.
 
 Mock mode prints a prominent warning on every startup, and generated mock reservation/event IDs begin with `mock_`. The server refuses to start with `CYCLES_MOCK=true` and `NODE_ENV=production` unless `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` is also set.
 

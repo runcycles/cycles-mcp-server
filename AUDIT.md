@@ -360,3 +360,15 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 Distribution-channel artifacts for the listings sweep: a multi-stage `node:20-alpine` image (npm pinned to 11 in the build stage — npm 10.8 hit the "Exit handler never called" bug during `npm ci`; docs/ copied next to dist/ so the `cycles://docs/*` resources resolve; `NODE_ENV=production` at runtime, stdio entrypoint) and a Smithery `startCommand` config mapping `cyclesBaseUrl`/`cyclesApiKey`/`cyclesMock` onto the standard env vars.
 
 **Verified:** image builds (224 MB) and passes a full MCP wire check over `docker run -i` — version 0.5.0, 9/9 tools metadata-complete, quickstart resource serves real content, mock reserve returns a `mock_`-prefixed ALLOW. Note the mock-mode production guard fires inside the image (it sets `NODE_ENV=production`), so mock evaluation in Docker requires the explicit `CYCLES_ALLOW_MOCK_IN_PRODUCTION=true` override — working as designed.
+
+---
+
+## Agent Ergonomics — Optional Keys, Subject Defaults, Budget Hints (2026-07-22)
+
+**Files:** `src/schemas.ts`, `src/tools/util.ts`, all 7 tool handlers, `tests/`, `README.md`.
+
+**Spec-conformance note (spec remains the authority):** the protocol REQUIRES `idempotency_key` on mutating calls and a subject on reserve/decide/events — and every wire request still carries them. What changed is only the MCP-facing input schema (client-side policy): `idempotencyKey` is now optional on the six mutating tools (the adapter layer generates `mcp_<uuid>` when omitted), and `subject` is optional on reserve/decide/create_event, merged from operator-configured `CYCLES_DEFAULT_TENANT/WORKSPACE/APP/WORKFLOW/AGENT/TOOLSET` env vars (explicit fields win; dimensions never defaulted; the ≥1-standard-field validation still runs post-merge and its error now points at the env defaults). `cycles_check_balance` accepts an empty call when defaults supply a filter.
+
+**Budget-pressure hints:** tool results append plain-text nudges AFTER the JSON payload on `DENY` (stop/degrade), `ALLOW_WITH_CAPS` (respect caps), and any balance entry under 15% of allocated (suggest cheaper models/fewer retries). Deliberately text-only — `structuredContent` remains exactly the declared output schema.
+
+**Verified:** 196 tests (new suites: key generation format asserted at the adapter boundary, env-default merge + explicit-wins, no-defaults still rejects, empty balance call with defaults, all three hint types, structuredContent purity, no hints on healthy responses); coverage 98.23% lines; typecheck + lint clean.

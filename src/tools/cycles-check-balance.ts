@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { CheckBalanceInputSchema, CheckBalanceOutputSchema, validateBalanceFilter } from "../schemas.js";
-import { toolResult, toolError, READ_ONLY_TOOL } from "./util.js";
+import { toolResult, toolError, applySubjectDefaults, READ_ONLY_TOOL } from "./util.js";
 
 export function registerCheckBalanceTool(
   server: McpServer,
@@ -19,7 +19,8 @@ export function registerCheckBalanceTool(
     },
     async (params) => {
       try {
-        const filterError = validateBalanceFilter(params);
+        const filters = applySubjectDefaults(params);
+        const filterError = validateBalanceFilter(filters);
         if (filterError) return toolError(new Error(filterError));
 
         const queryParams: Record<string, string> = {};
@@ -31,7 +32,7 @@ export function registerCheckBalanceTool(
           "agent",
           "toolset",
         ] as const) {
-          if (params[key]) queryParams[key] = params[key];
+          if (typeof filters[key] === "string" && filters[key]) queryParams[key] = filters[key];
         }
         if (params.includeChildren !== undefined)
           queryParams.include_children = String(params.includeChildren);

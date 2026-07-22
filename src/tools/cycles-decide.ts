@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ClientAdapter } from "../client-adapter.js";
 import { DecideInputSchema, DecideOutputSchema, validateSubject } from "../schemas.js";
-import { toolResult, toolError, IDEMPOTENT_WRITE_TOOL } from "./util.js";
+import { toolResult, toolError, ensureIdempotencyKey, applySubjectDefaults, IDEMPOTENT_WRITE_TOOL } from "./util.js";
 
 export function registerDecideTool(
   server: McpServer,
@@ -19,12 +19,13 @@ export function registerDecideTool(
     },
     async (params) => {
       try {
-        const subjectError = validateSubject(params.subject);
+        const subject = applySubjectDefaults(params.subject);
+        const subjectError = validateSubject(subject);
         if (subjectError) return toolError(new Error(subjectError));
 
         const response = await adapter.decide({
-          idempotencyKey: params.idempotencyKey,
-          subject: params.subject,
+          idempotencyKey: ensureIdempotencyKey(params.idempotencyKey),
+          subject,
           action: params.action,
           estimate: params.estimate,
           metadata: params.metadata,

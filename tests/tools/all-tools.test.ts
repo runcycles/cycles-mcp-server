@@ -487,3 +487,148 @@ describe("structured output", () => {
     expect(result.structuredContent).toBeUndefined();
   });
 });
+
+describe("agent ergonomics", () => {
+  it("generates a mcp_-prefixed idempotency key when omitted", async () => {
+    const spy = vi.spyOn(adapter, "createReservation");
+    const tool = (server as any)._registeredTools["cycles_reserve"];
+    const result = await tool.handler({
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    });
+    expect(result.isError).toBeUndefined();
+    expect(spy.mock.calls[0][0].idempotencyKey).toMatch(/^mcp_[0-9a-f-]{36}$/);
+  });
+
+  it("passes an explicit idempotency key through unchanged", async () => {
+    const spy = vi.spyOn(adapter, "commitReservation");
+    const tool = (server as any)._registeredTools["cycles_commit"];
+    await tool.handler({
+      reservationId: "rsv_1",
+      idempotencyKey: "explicit-key",
+      actual: { unit: "TOKENS", amount: 10 },
+    });
+    expect(spy.mock.calls[0][1].idempotencyKey).toBe("explicit-key");
+  });
+
+  it("fills subject from CYCLES_DEFAULT_* env vars when omitted", async () => {
+    vi.stubEnv("CYCLES_DEFAULT_TENANT", "env-tenant");
+    vi.stubEnv("CYCLES_DEFAULT_APP", "env-app");
+    try {
+      const spy = vi.spyOn(adapter, "createReservation");
+      const tool = (server as any)._registeredTools["cycles_reserve"];
+      const result = await tool.handler({
+        action: { kind: "llm.completion", name: "gpt" },
+        estimate: { unit: "TOKENS", amount: 100 },
+      });
+      expect(result.isError).toBeUndefined();
+      expect(spy.mock.calls[0][0].subject).toEqual({ tenant: "env-tenant", app: "env-app" });
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("explicit subject fields win over env defaults", async () => {
+    vi.stubEnv("CYCLES_DEFAULT_TENANT", "env-tenant");
+    try {
+      const spy = vi.spyOn(adapter, "decide");
+      const tool = (server as any)._registeredTools["cycles_decide"];
+      await tool.handler({
+        subject: { tenant: "explicit-tenant" },
+        action: { kind: "llm.completion", name: "gpt" },
+        estimate: { unit: "TOKENS", amount: 100 },
+      });
+      expect(spy.mock.calls[0][0].subject.tenant).toBe("explicit-tenant");
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+
+  it("still rejects when no subject and no env defaults", async () => {
+    const tool = (server as any)._registeredTools["cycles_reserve"];
+    const result = await tool.handler({
+      action: { kind: "llm.completion", name: "gpt" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    });
+    expect(result.isError).toBe(true);
+    expect(JSON.parse(result.content[0].text).message).toContain("CYCLES_DEFAULT_");
+  });
+
+  it("cycles_check_balance works with only env-default filters", async () => {
+    vi.stubEnv("CYCLES_DEFAULT_TENANT", "env-tenant");
+    try {
+      const tool = (server as any)._registeredTools["cycles_check_balance"];
+      const result = await tool.handler({});
+      expect(result.isError).toBeUndefined();
+      expect(result.structuredContent.balances).toBeDefined();
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
+});
+
+describe("budget-pressure hints", () => {
+  it("appends a DENY hint as extra text content", async () => {
+    vi.spyOn(adapter, "decide").mockResolvedValue({
+      decision: "DENY" as any,
+      reasonCode: "BUDGET_EXHAUSTED",
+      affectedScopes: [],
+    });
+    const tool = (server as any)._registeredTools["cycles_decide"];
+    const result = await tool.handler({
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    });
+    expect(result.content.length).toBe(2);
+    expect(result.content[1].text).toContain("DENIED");
+    // structuredContent stays pure — hints are text-only
+    expect(result.structuredContent.decision).toBe("DENY");
+    expect(JSON.stringify(result.structuredContent)).not.toContain("HINT");
+  });
+
+  it("appends a caps hint on ALLOW_WITH_CAPS", async () => {
+    vi.spyOn(adapter, "decide").mockResolvedValue({
+      decision: "ALLOW_WITH_CAPS" as any,
+      caps: { maxTokens: 500 },
+    });
+    const tool = (server as any)._registeredTools["cycles_decide"];
+    const result = await tool.handler({
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    });
+    expect(result.content[1].text).toContain("WITH CAPS");
+  });
+
+  it("appends a low-budget hint when remaining/allocated is under threshold", async () => {
+    vi.spyOn(adapter, "getBalances").mockResolvedValue({
+      balances: [
+        {
+          scope: "tenant:t1",
+          scopePath: "tenant:t1",
+          remaining: { unit: "TOKENS", amount: 100 },
+          allocated: { unit: "TOKENS", amount: 1000 },
+        },
+      ],
+    });
+    const tool = (server as any)._registeredTools["cycles_check_balance"];
+    const result = await tool.handler({ tenant: "t1" });
+    expect(result.content.length).toBe(2);
+    expect(result.content[1].text).toContain("low budget");
+    expect(result.content[1].text).toContain("10%");
+  });
+
+  it("adds no hints on healthy ALLOW responses", async () => {
+    const tool = (server as any)._registeredTools["cycles_reserve"];
+    const result = await tool.handler({
+      idempotencyKey: "k1",
+      subject: { tenant: "t1" },
+      action: { kind: "llm.completion", name: "gpt" },
+      estimate: { unit: "TOKENS", amount: 100 },
+    });
+    // mock balances are 75% remaining — no hint expected
+    expect(result.content.length).toBe(1);
+  });
+});

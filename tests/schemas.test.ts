@@ -263,9 +263,14 @@ describe("ReserveInputSchema", () => {
     ).toThrow();
   });
 
-  it("rejects missing idempotencyKey", () => {
+  it("accepts missing idempotencyKey (auto-generated at the tool layer)", () => {
     const { idempotencyKey: _, ...rest } = validInput;
-    expect(() => ReserveInputSchema.parse(rest)).toThrow();
+    expect(() => ReserveInputSchema.parse(rest)).not.toThrow();
+  });
+
+  it("accepts missing subject (CYCLES_DEFAULT_* merged at the tool layer)", () => {
+    const { subject: _, ...rest } = validInput;
+    expect(() => ReserveInputSchema.parse(rest)).not.toThrow();
   });
 });
 
