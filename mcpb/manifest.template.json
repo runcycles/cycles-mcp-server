@@ -17,7 +17,9 @@
   "documentation": "https://github.com/runcycles/cycles-mcp-server#readme",
   "support": "https://github.com/runcycles/cycles-mcp-server/issues",
   "license": "Apache-2.0",
-  "privacy_policies": ["https://runcycles.io/privacy"],
+  "privacy_policies": [
+    "https://runcycles.io/privacy"
+  ],
   "keywords": [
     "budget",
     "cost-control",
@@ -31,11 +33,19 @@
     "entry_point": "server/index.cjs",
     "mcp_config": {
       "command": "node",
-      "args": ["${__dirname}/server/index.cjs"],
+      "args": [
+        "${__dirname}/server/index.cjs"
+      ],
       "env": {
         "CYCLES_BASE_URL": "${user_config.base_url}",
         "CYCLES_API_KEY": "${user_config.api_key}",
-        "CYCLES_MOCK": "${user_config.mock_mode}"
+        "CYCLES_MOCK": "${user_config.mock_mode}",
+        "CYCLES_DEFAULT_TENANT": "${user_config.default_tenant}",
+        "CYCLES_DEFAULT_WORKSPACE": "${user_config.default_workspace}",
+        "CYCLES_DEFAULT_APP": "${user_config.default_app}",
+        "CYCLES_DEFAULT_WORKFLOW": "${user_config.default_workflow}",
+        "CYCLES_DEFAULT_AGENT": "${user_config.default_agent}",
+        "CYCLES_DEFAULT_TOOLSET": "${user_config.default_toolset}"
       }
     }
   },
@@ -59,21 +69,88 @@
       "description": "Return synthetic ALLOW responses without contacting a Cycles server. Lets you explore the tools, but performs no budget enforcement.",
       "default": false,
       "required": false
+    },
+    "default_tenant": {
+      "type": "string",
+      "title": "Default tenant",
+      "description": "Optional default tenant merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
+    },
+    "default_workspace": {
+      "type": "string",
+      "title": "Default workspace",
+      "description": "Optional default workspace merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
+    },
+    "default_app": {
+      "type": "string",
+      "title": "Default app",
+      "description": "Optional default app merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
+    },
+    "default_workflow": {
+      "type": "string",
+      "title": "Default workflow",
+      "description": "Optional default workflow merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
+    },
+    "default_agent": {
+      "type": "string",
+      "title": "Default agent",
+      "description": "Optional default agent merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
+    },
+    "default_toolset": {
+      "type": "string",
+      "title": "Default toolset",
+      "description": "Optional default toolset merged into any tool call that omits it, so the agent can call budget tools without repeating the subject.",
+      "required": false
     }
   },
   "tools": [
-    { "name": "cycles_reserve", "description": "Reserve budget before a costly operation" },
-    { "name": "cycles_commit", "description": "Commit actual usage after an operation completes" },
-    { "name": "cycles_release", "description": "Release a reservation without committing" },
-    { "name": "cycles_extend", "description": "Extend reservation TTL (heartbeat)" },
-    { "name": "cycles_decide", "description": "Lightweight preflight budget check" },
-    { "name": "cycles_check_balance", "description": "Check current budget balance for a scope" },
-    { "name": "cycles_list_reservations", "description": "List reservations with filters" },
-    { "name": "cycles_get_reservation", "description": "Get reservation details by ID" },
-    { "name": "cycles_create_event", "description": "Record usage without the reserve/commit lifecycle" }
+    {
+      "name": "cycles_reserve",
+      "description": "Reserve budget before a costly operation"
+    },
+    {
+      "name": "cycles_commit",
+      "description": "Commit actual usage after an operation completes"
+    },
+    {
+      "name": "cycles_release",
+      "description": "Release a reservation without committing"
+    },
+    {
+      "name": "cycles_extend",
+      "description": "Extend reservation TTL (heartbeat)"
+    },
+    {
+      "name": "cycles_decide",
+      "description": "Lightweight preflight budget check"
+    },
+    {
+      "name": "cycles_check_balance",
+      "description": "Check current budget balance for a scope"
+    },
+    {
+      "name": "cycles_list_reservations",
+      "description": "List reservations with filters"
+    },
+    {
+      "name": "cycles_get_reservation",
+      "description": "Get reservation details by ID"
+    },
+    {
+      "name": "cycles_create_event",
+      "description": "Record usage without the reserve/commit lifecycle"
+    }
   ],
   "compatibility": {
-    "platforms": ["darwin", "win32", "linux"],
+    "platforms": [
+      "darwin",
+      "win32",
+      "linux"
+    ],
     "runtimes": {
       "node": ">=20.0.0"
     }

@@ -263,9 +263,14 @@ describe("ReserveInputSchema", () => {
     ).toThrow();
   });
 
-  it("rejects missing idempotencyKey", () => {
+  it("rejects missing idempotencyKey (retry dedup requires a caller-stable key)", () => {
     const { idempotencyKey: _, ...rest } = validInput;
     expect(() => ReserveInputSchema.parse(rest)).toThrow();
+  });
+
+  it("accepts missing subject (CYCLES_DEFAULT_* merged at the tool layer)", () => {
+    const { subject: _, ...rest } = validInput;
+    expect(() => ReserveInputSchema.parse(rest)).not.toThrow();
   });
 });
 

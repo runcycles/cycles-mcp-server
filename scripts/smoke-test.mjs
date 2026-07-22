@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Post-publish smoke test: installs the just-published package from the npm
 // registry via npx, speaks real MCP to it over stdio (initialize, tools/list,
-// two tool calls in mock mode), and fails loudly if anything is broken.
+// balance/reserve/release tool calls and a resource read in mock mode),
+// and fails loudly if anything is broken.
 //
 // Usage: node scripts/smoke-test.mjs <version>
 import { mkdtempSync } from "node:fs";
@@ -79,7 +80,7 @@ try {
   const reserve = await client.callTool({
     name: "cycles_reserve",
     arguments: {
-      idempotencyKey: `smoke-${Date.now()}`,
+      idempotencyKey: `smoke-${version}`,
       subject: { tenant: "smoke-test" },
       action: { kind: "llm.completion", name: "smoke" },
       estimate: { unit: "TOKENS", amount: 100 },
@@ -90,6 +91,13 @@ try {
   if (typeof reservationId !== "string" || !reservationId.startsWith("mock_")) {
     fail(`expected mock_ reservation id, got: ${String(reservationId)}`);
   }
+
+  const release = await client.callTool({
+    name: "cycles_release",
+    arguments: { reservationId, idempotencyKey: `smoke-rel-${version}` },
+  });
+  if (release.isError) fail(`cycles_release errored: ${JSON.stringify(release.content)}`);
+  if (release.structuredContent?.status !== "RELEASED") fail("cycles_release did not return RELEASED");
 
   // Docs resources must serve real content from the published tarball —
   // path resolution differs between source and bundled layouts, and this

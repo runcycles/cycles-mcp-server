@@ -39,6 +39,42 @@
             "false"
           ],
           "isRequired": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_TENANT",
+          "description": "Optional default tenant merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_WORKSPACE",
+          "description": "Optional default workspace merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_APP",
+          "description": "Optional default app merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_WORKFLOW",
+          "description": "Optional default workflow merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_AGENT",
+          "description": "Optional default agent merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
+        },
+        {
+          "name": "CYCLES_DEFAULT_TOOLSET",
+          "description": "Optional default toolset merged into any tool call that omits it (explicit fields win).",
+          "isRequired": false,
+          "isSecret": false
         }
       ]
     }
