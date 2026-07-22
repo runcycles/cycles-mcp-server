@@ -8,12 +8,12 @@
     "url": "https://github.com/runcycles/cycles-mcp-server",
     "source": "github"
   },
-  "version": "0.4.1",
+  "version": "0.5.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@runcycles/mcp-server",
-      "version": "0.4.1",
+      "version": "0.5.0",
       "runtimeHint": "npx",
       "transport": {
         "type": "stdio"
@@ -34,7 +34,10 @@
           "name": "CYCLES_MOCK",
           "description": "Enable mock mode for local development — no API key or live server required.",
           "default": "false",
-          "choices": ["true", "false"],
+          "choices": [
+            "true",
+            "false"
+          ],
           "isRequired": false
         }
       ]

@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-18
 **Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.24)
-**MCP Server:** `@runcycles/mcp-server` v0.4.1 (Node 20+ / `@modelcontextprotocol/sdk` / TypeScript 6) <!-- x-release-please-version -->
+**MCP Server:** `@runcycles/mcp-server` v0.5.0 (Node 20+ / `@modelcontextprotocol/sdk` / TypeScript 6) <!-- x-release-please-version -->
 **Client dependency:** `runcycles` ^0.3.0 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
 
 ---
@@ -332,7 +332,7 @@ The MCP server is **fully protocol-conformant** with the Cycles Protocol v0.1.24
 
 **Motivation:** every release to date required a hand-built release PR bumping the version in three places (`package.json`, both `server.json` fields, the AUDIT.md header) plus a CHANGELOG promotion — and history shows the failure mode (the 0.2.3 npm/registry version skew; repeated manual sync commits).
 
-**Design:** release-please (pinned v4.4.1 by SHA) maintains a release PR from conventional commits on `main`. Version sync: `extra-files` JSON updaters cover both `server.json` version fields; a generic updater bumps the AUDIT.md header via the `x-release-please-version` annotation. Changelog sections map conventional types onto the existing Added/Fixed/Changed vocabulary. Merging the release PR creates the tag and GitHub release.
+**Design:** release-please (pinned v0.5.0 by SHA) maintains a release PR from conventional commits on `main`. Version sync: `extra-files` JSON updaters cover both `server.json` version fields; a generic updater bumps the AUDIT.md header via the `x-release-please-version` annotation. Changelog sections map conventional types onto the existing Added/Fixed/Changed vocabulary. Merging the release PR creates the tag and GitHub release.
 
 **Key constraint handled:** tags created with the default `GITHUB_TOKEN` do NOT trigger other workflows — the `v*` publish pipeline in `ci.yml` would silently never run. `workflow_dispatch` is exempt from that restriction, so the release-please workflow explicitly dispatches `ci.yml` with `--ref <new tag>`; the tag-conditional publish jobs match because the dispatched ref is the tag. The existing GitHub-release job is already idempotent against the release-please-created release (creation skipped when it exists; the MCPB asset upload runs regardless, with `--clobber`). Manual tag-push releases keep working unchanged.
 

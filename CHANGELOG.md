@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [0.5.0](https://github.com/runcycles/cycles-mcp-server/compare/v0.4.1...v0.5.0) (2026-07-22)
+
+
+### Added
+
+* **ci:** automate releases with release-please ([#151](https://github.com/runcycles/cycles-mcp-server/issues/151)) ([37b125a](https://github.com/runcycles/cycles-mcp-server/commit/37b125a080217fb6ac390eac07cc575b15e8e286))
+
 ## [0.4.1] - 2026-07-21
 
 Distribution release: fixes the docs resources that were broken in every published npm version, and attaches the first Claude Desktop one-click extension bundle (.mcpb) to the GitHub release.
