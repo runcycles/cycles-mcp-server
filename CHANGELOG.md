@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.0](https://github.com/runcycles/cycles-mcp-server/compare/v0.5.0...v0.6.0) (2026-07-22)
+
+
+### Added
+
+* agent ergonomics — subject env defaults and budget-pressure hints ([#160](https://github.com/runcycles/cycles-mcp-server/issues/160)) ([4b4da56](https://github.com/runcycles/cycles-mcp-server/commit/4b4da569729dd3c5ffe6ddc172c2e9dc4942ef2a))
+* Dockerfile and Smithery config for directory listings ([#158](https://github.com/runcycles/cycles-mcp-server/issues/158)) ([d1d67f9](https://github.com/runcycles/cycles-mcp-server/commit/d1d67f9122c1983760bde2ef587e74bf454f9d0a))
+
 ## [0.5.0](https://github.com/runcycles/cycles-mcp-server/compare/v0.4.1...v0.5.0) (2026-07-22)
 
 
