@@ -7,6 +7,19 @@
 
 ---
 
+## 2026-07-26 — dependency and release-workflow maintenance
+
+Dependabot PRs #161–#168 update the resolved `runcycles` client from 0.3.1 to
+0.3.4, ESLint to 10.8.0, the TypeScript ESLint plugin to 8.65.0, PostCSS to
+8.5.23, release-please-action to 5.0.0, CodeQL's SARIF uploader to 4.37.3,
+OSSF Scorecard to 2.4.4, and checkout to 7.0.1. The package range and MCP API
+surface are unchanged; the newer client contributes additive protocol error
+handling and mapping fixes. PostCSS includes upstream source-map loading
+hardening, and release-please 5 changes only its action runtime to Node 24.
+All workflow actions remain SHA-pinned. Node 20/22 tests, typecheck, lint,
+coverage, build, package, CodeQL, and security checks passed on the reviewed
+heads. No MCP tool schema or Cycles wire-contract change is claimed.
+
 ## Summary
 
 | Category | Pass | Issues |
