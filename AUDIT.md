@@ -3,9 +3,22 @@
 **Date:** 2026-07-18
 **Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.24)
 **MCP Server:** `@runcycles/mcp-server` v0.6.0 (Node 20+ / `@modelcontextprotocol/sdk` / TypeScript 6) <!-- x-release-please-version -->
-**Client dependency:** `runcycles` ^0.3.0 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
+**Client dependency:** `runcycles` ^0.4.0 (TypeScript client, audited separately in `cycles-client-typescript/AUDIT.md`)
 
 ---
+
+## 2026-07-27 — runcycles ^0.4.0
+
+Bumps the `runcycles` range from ^0.3.0 to ^0.4.0 (resolved 0.4.0). 0.4.0 adds
+durable commit retries (on-disk journal with replay, `POST /v1/events`
+fallback for expired commits, public `flushPendingCommits()`) and changes
+`StreamReservation.commit()` to resolve on transient failures. The server's
+adapter calls `CyclesClient.commitReservation` directly and uses neither
+`reserveForStream` nor the lifecycle engine, so no behavior changes and the
+journal does not engage on this path; no shutdown flush is needed. Typecheck,
+lint, and all 197 tests pass. Recommended follow-up: route `cycles_commit`
+through the SDK lifecycle engine for journaled durability, flushing pending
+commits on shutdown if adopted.
 
 ## 2026-07-26 — dependency and release-workflow maintenance
 
