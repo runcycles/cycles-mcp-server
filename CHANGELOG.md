@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog 1.1.0](https://keepachangelog.com/en/1.1.0/).
 
+## [0.6.1](https://github.com/runcycles/cycles-mcp-server/compare/v0.6.0...v0.6.1) (2026-07-27)
+
+
+### Fixed
+
+* **deps:** bump runcycles from ^0.3.0 to ^0.4.0 ([#171](https://github.com/runcycles/cycles-mcp-server/issues/171)) ([f2888bb](https://github.com/runcycles/cycles-mcp-server/commit/f2888bb8bb16acbfcb38556672d4c4a860931973))
+
+
+### Documentation
+
+* audit dependency maintenance ([#169](https://github.com/runcycles/cycles-mcp-server/issues/169)) ([b437f78](https://github.com/runcycles/cycles-mcp-server/commit/b437f781e18014ab55c4771fc69f7d176bb35bd0))
+
 ## [0.6.0](https://github.com/runcycles/cycles-mcp-server/compare/v0.5.0...v0.6.0) (2026-07-22)
 
 
