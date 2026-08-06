@@ -20,7 +20,9 @@ jobs:
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3
       - name: Enable auto-merge for patch updates
         if: steps.meta.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr merge --auto --merge "$PR_URL"
+        # --squash: merge commits are disabled on this repo, so --merge makes
+        # this job fail with "Merge method merge commits are not allowed".
+        run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           # AUTOMERGE_PAT (repo+workflow scope) lets auto-merge work on PRs that
