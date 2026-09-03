@@ -50,6 +50,10 @@ An agent processes a large dataset in chunks, each chunk taking several minutes.
 
 You have an existing system that already makes LLM calls and you just want to track spend, not gate it. After each call completes, the agent fires `cycles_create_event` with the actual cost. No reservation needed — the event is applied atomically to all budget scopes (tenant, workspace, app). You get a real-time spend dashboard without changing your existing call flow.
 
+### Grok Bot with a non-bypassable paid-media action
+
+Grok Bot can call custom MCP tools, but installing the standalone Cycles tools beside a paid-media connector remains cooperative: the Bot could call the other connector directly. The [Grok Bot paid-media gateway](examples/grok-bot-paid-media-gateway/) shows the hard-enforcement shape instead. Its mutation handler derives scope from trusted server configuration, requires a live `RISK_POINTS` reservation, propagates the reservation ID to the downstream API, and conservatively settles ambiguous outcomes.
+
 ## Installation
 
 ```bash

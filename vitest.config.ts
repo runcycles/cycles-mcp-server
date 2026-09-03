@@ -7,7 +7,10 @@ export default defineConfig({
     environment: "node",
     pool: "threads",
     coverage: {
-      include: ["src/**/*.ts"],
+      include: [
+        "src/**/*.ts",
+        "examples/grok-bot-paid-media-gateway/gateway.ts",
+      ],
       exclude: ["src/index.ts"],
       thresholds: {
         lines: 95,
