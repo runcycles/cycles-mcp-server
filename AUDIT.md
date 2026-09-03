@@ -30,6 +30,18 @@ release/commit failures, ambiguous downstream outcomes, identity scoping, risk
 estimation, and MCP result mapping. The example source is included in lint and
 typecheck runs; the gateway's enforcement logic is included in coverage.
 
+An HTTP-level integration harness now drives the official MCP client through
+the shipped Express boundary and real `runcycles`/paid-media adapters, backed by
+loopback Cycles and provider services. It verifies request ordering, trusted
+subject scope, risk amounts, idempotency and correlation headers, commit and
+denial behavior, provider conflicts, upstream outages, bearer authentication,
+origin checks, rate limiting, and defaults. The harness exposed and fixed a
+runtime defect: current MCP SDK stateless transports are single-request, but
+the example reused one transport for initialization and later calls. The
+gateway now creates and closes a fresh stateless server and transport for every
+MCP POST. The concrete HTTP boundary is included in coverage; all 227 tests and
+the repository coverage gates pass.
+
 ---
 
 ## 2026-07-27 — runcycles ^0.4.0
