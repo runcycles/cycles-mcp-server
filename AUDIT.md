@@ -7,6 +7,30 @@
 
 ---
 
+## 2026-09-03 — Grok Bot paid-media reference gateway
+
+Added a runnable custom MCP example whose `apply_campaign_daily_budget` tool
+places Cycles directly in the mutation path. Tenant, member/credential scope,
+workflow, paid-media account, and maximum budget are trusted server
+configuration rather than model-supplied inputs. It reads the current campaign
+budget from the provider and sends that value as an optimistic-concurrency
+condition on the mutation, preventing a model-supplied or silently stale value
+from weakening the risk estimate. The handler fails closed on
+reservation errors or denials, propagates stable idempotency and reservation
+IDs downstream, releases only on cancellation before dispatch, and commits
+caller-assigned `RISK_POINTS` when a post-dispatch outcome is ambiguous.
+
+The example requires bearer authentication, validates configured browser
+origins when present, keeps Grok Bot approval and downstream authorization as
+separate controls, and defaults agent scope to `member-shared` unless trusted
+infrastructure supplies a verified Bot identifier. Unit tests cover success,
+denial, transport failure, application-policy denial, cancellation,
+release/commit failures, ambiguous downstream outcomes, identity scoping, risk
+estimation, and MCP result mapping. The example source is included in lint and
+typecheck runs; the gateway's enforcement logic is included in coverage.
+
+---
+
 ## 2026-07-27 — runcycles ^0.4.0
 
 Bumps the `runcycles` range from ^0.3.0 to ^0.4.0 (resolved 0.4.0). 0.4.0 adds

@@ -35,6 +35,7 @@
   "files": [
     "dist",
     "docs",
+    "examples/grok-bot-paid-media-gateway",
     "server.json",
     "LICENSE",
     "README.md"
@@ -49,11 +50,13 @@
     "dev": "tsx src/index.ts",
     "dev:http": "tsx src/index.ts --transport http",
     "dev:stdio": "tsx src/index.ts --transport stdio",
-    "lint": "eslint src/",
+    "example:grok-bot": "tsx examples/grok-bot-paid-media-gateway/server.ts",
+    "example:grok-bot:mock": "tsx examples/grok-bot-paid-media-gateway/mock-paid-media-api.ts",
+    "lint": "eslint src/ examples/grok-bot-paid-media-gateway/",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit && tsc --noEmit -p examples/grok-bot-paid-media-gateway/tsconfig.json"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
