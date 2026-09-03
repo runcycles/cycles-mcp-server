@@ -4,6 +4,7 @@ import express, {
   type RequestHandler,
   type Response,
 } from "express";
+import { rateLimit } from "express-rate-limit";
 import { timingSafeEqual } from "node:crypto";
 import { CyclesClient, CyclesConfig } from "runcycles";
 import {
@@ -24,6 +25,14 @@ function positiveNumber(name: string, fallback: number): number {
   const value = raw === undefined ? fallback : Number(raw);
   if (!Number.isFinite(value) || value <= 0) {
     throw new Error(`${name} must be a positive number.`);
+  }
+  return value;
+}
+
+function positiveInteger(name: string, fallback: number): number {
+  const value = positiveNumber(name, fallback);
+  if (!Number.isSafeInteger(value)) {
+    throw new Error(`${name} must be a positive integer.`);
   }
   return value;
 }
@@ -271,7 +280,16 @@ async function main(): Promise<void> {
   app.get("/health", (_request: Request, response: Response) => {
     response.json({ status: "ok" });
   });
-  const policies = [originPolicy(allowedOrigins), bearerAuth(authToken)];
+  const policies = [
+    rateLimit({
+      windowMs: positiveInteger("MCP_RATE_LIMIT_WINDOW_MS", 60_000),
+      limit: positiveInteger("MCP_RATE_LIMIT_MAX", 60),
+      standardHeaders: "draft-8",
+      legacyHeaders: false,
+    }),
+    originPolicy(allowedOrigins),
+    bearerAuth(authToken),
+  ];
   const handle: RequestHandler = async (request, response) => {
     await transport.handleRequest(request, response);
   };
@@ -279,7 +297,7 @@ async function main(): Promise<void> {
   app.get("/mcp", ...policies, handle);
   app.delete("/mcp", ...policies, handle);
 
-  const port = positiveNumber("PORT", 3_001);
+  const port = positiveInteger("PORT", 3_001);
   const host = process.env.HOST?.trim() || "127.0.0.1";
   app.listen(port, host, () => {
     console.error(`Grok Bot paid-media gateway: http://${host}:${port}/mcp`);

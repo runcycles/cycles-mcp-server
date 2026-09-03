@@ -20,10 +20,11 @@ reservation errors or denials, propagates stable idempotency and reservation
 IDs downstream, releases only on cancellation before dispatch, and commits
 caller-assigned `RISK_POINTS` when a post-dispatch outcome is ambiguous.
 
-The example requires bearer authentication, validates configured browser
-origins when present, keeps Grok Bot approval and downstream authorization as
-separate controls, and defaults agent scope to `member-shared` unless trusted
-infrastructure supplies a verified Bot identifier. Unit tests cover success,
+The example requires bearer authentication, rate-limits the MCP and mock API
+routes, validates configured browser origins when present, keeps Grok Bot
+approval and downstream authorization as separate controls, and defaults agent
+scope to `member-shared` unless trusted infrastructure supplies a verified Bot
+identifier. Unit tests cover success,
 denial, transport failure, application-policy denial, cancellation,
 release/commit failures, ambiguous downstream outcomes, identity scoping, risk
 estimation, and MCP result mapping. The example source is included in lint and

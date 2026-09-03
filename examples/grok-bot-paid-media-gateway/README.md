@@ -24,6 +24,8 @@ account, and maximum daily budget all come from environment configuration.
 - The risk estimate uses the provider's current budget, not a model assertion.
 - A concurrent budget change makes the downstream write fail instead of silently
   applying an estimate based on stale state.
+- The MCP endpoint is authenticated and rate-limited. The defaults allow 60
+  requests per source address per 60-second window.
 - `operationId` becomes the Cycles and downstream idempotency key.
 - `X-Cycles-Reservation-ID` and the provider request ID correlate audit records.
 - Cancellation before dispatch releases the reservation.
@@ -66,6 +68,8 @@ export PAID_MEDIA_API_URL=http://127.0.0.1:4100
 export PAID_MEDIA_API_TOKEN=demo-paid-media-token
 export MAX_DAILY_BUDGET_USD=5000
 export MCP_HTTP_AUTH_TOKEN=replace-with-a-long-random-token
+export MCP_RATE_LIMIT_MAX=60
+export MCP_RATE_LIMIT_WINDOW_MS=60000
 npm run example:grok-bot
 ```
 
@@ -100,6 +104,8 @@ This is a reference boundary, not a complete paid-media integration. Before
 production use:
 
 - Replace the single shared MCP token with OAuth or an identity-aware gateway.
+- Enforce distributed rate limits at the edge; the built-in memory store is
+  per process and intended as a safe example default.
 - Resolve `GROK_MEMBER_SCOPE` from authenticated connector identity rather than
   sharing one deployment across members.
 - Set `GROK_VERIFIED_BOT_SCOPE` only when trusted infrastructure supplies a

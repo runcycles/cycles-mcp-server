@@ -1,6 +1,15 @@
 import express from "express";
+import { rateLimit } from "express-rate-limit";
 
 const app = express();
+app.use(
+  rateLimit({
+    windowMs: 60_000,
+    limit: 60,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+  }),
+);
 app.use(express.json());
 const campaignBudgets = new Map([["cmp_search_us", 800]]);
 
