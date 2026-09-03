@@ -26,6 +26,8 @@ account, and maximum daily budget all come from environment configuration.
   applying an estimate based on stale state.
 - The MCP endpoint is authenticated and rate-limited. The defaults allow 60
   requests per source address per 60-second window.
+- Every stateless MCP POST receives a fresh server transport, as required by
+  the MCP SDK; transports are closed when their HTTP response completes.
 - `operationId` becomes the Cycles and downstream idempotency key.
 - `X-Cycles-Reservation-ID` and the provider request ID correlate audit records.
 - Cancellation before dispatch releases the reservation.
@@ -121,3 +123,19 @@ production use:
 See the companion article,
 [Grok Bot Has a Computer. Where Does Cycles Fit?](https://runcycles.io/blog/grok-bot-runtime-authority),
 and the general [MCP enforcement pattern](https://runcycles.io/blog/mcp-tool-budgets-before-execution).
+
+## Verification
+
+The repository test suite includes a loopback HTTP integration harness. It
+uses the official MCP client against the gateway while separate local services
+stand in for Cycles and the paid-media provider. The harness verifies the full
+request order, trusted subject scope, risk calculation, idempotency and
+correlation headers, commit behavior, fail-closed denial and outage behavior,
+stale-write handling, bearer authentication, origin policy, and rate limits.
+
+Run it with the rest of the suite:
+
+```bash
+npm test
+npm run test:coverage
+```

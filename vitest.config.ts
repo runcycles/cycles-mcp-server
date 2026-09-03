@@ -10,6 +10,7 @@ export default defineConfig({
       include: [
         "src/**/*.ts",
         "examples/grok-bot-paid-media-gateway/gateway.ts",
+        "examples/grok-bot-paid-media-gateway/http.ts",
       ],
       exclude: ["src/index.ts"],
       thresholds: {
