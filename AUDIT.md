@@ -7,6 +7,18 @@
 
 ---
 
+## 2026-09-08 — TypeScript ESLint dependency review
+
+Dependabot PR #207 updates the development-only ESLint plugin and its parser
+peer from 8.68.0 to 8.69.0 in the lockfile, also covering the parser update in
+#208. Manifest ranges, server source, and protocol behavior are unchanged.
+The upstream release contains an optional lint-rule setting and rule fixes.
+
+On dependency head `395cee7`, CI passed on Node 20 and 22, including lint,
+typecheck, build, and coverage. All 227 tests passed; the Node 20 run reported
+97.18% line coverage (88.93% branches), preserving the repository gates.
+Evidence: [CI run 34013036447](https://github.com/runcycles/cycles-mcp-server/actions/runs/34013036447).
+
 ## 2026-09-03 — Grok Bot paid-media reference gateway
 
 Added a runnable custom MCP example whose `apply_campaign_daily_budget` tool
