@@ -72,6 +72,18 @@ heads. No MCP tool schema or Cycles wire-contract change is claimed.
 
 ## Summary
 
+### 2026-09-08 — Zod dependency review
+
+Dependabot PR #209 updates resolved Zod from 4.4.3 to 4.5.4 within the existing
+`^4.3.6` range. This is a runtime dependency update, not an application source
+or protocol change. The existing MCP schema and HTTP integration tests
+exercise the update; the new Zod APIs are not adopted by this change.
+
+On dependency head `c0eafaf`, CI passed on Node 20 and 22, including lint,
+typecheck, build, and coverage. All 227 tests passed; the Node 20 run reported
+97.18% line coverage (88.93% branches), preserving the repository gates.
+Evidence: [CI run 34013050466](https://github.com/runcycles/cycles-mcp-server/actions/runs/34013050466).
+
 | Category | Pass | Issues |
 |----------|------|--------|
 | MCP Tools ↔ Protocol Endpoints | 9/9 | 0 |
