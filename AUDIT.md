@@ -7,6 +7,15 @@
 
 ---
 
+## 2026-09-27 — Node type definitions 26.6.2 dependency review
+
+PR #217 updates only the development lockfile from `@types/node` 26.5.1
+to 26.6.2. Runtime code, the Node 20+ support policy, and the YAML protocol
+contract are unchanged. The reviewed CI run passed lint, typecheck, build,
+and Node 20/22 tests. The Node 22 coverage run passed all 227 tests with
+97.18% line coverage, above the existing 95% gate.
+Evidence: [CI run 36296057782](https://github.com/runcycles/cycles-mcp-server/actions/runs/36296057782).
+
 ## 2026-09-08 — TypeScript ESLint dependency review
 
 Dependabot PR #207 updates the development-only ESLint plugin and its parser
