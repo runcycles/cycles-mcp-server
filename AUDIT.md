@@ -1,5 +1,9 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-10-04 — Dependency maintenance
+
+Consolidates Dependabot PRs #226, #227, #224, and #223: MCP SDK 1.31.0, TypeScript ESLint parser 8.71.0, ESLint 10.11.0, and ip-address 10.7.2. Server source and YAML protocol contracts are unchanged. Existing Node 20/22 lint, typecheck, build, and test coverage checks (95% line minimum) must pass on the combined commit before merge. Vitest remains on version 4 to preserve Node 20 support; the isolated Vitest 5 PR #225 was declined. Local lint and tests pass with 97.18% line coverage, and local typecheck/build pass.
+
 **Date:** 2026-07-18
 **Spec:** `cycles-protocol-v0.yaml` (OpenAPI 3.1.0, v0.1.24)
 **MCP Server:** `@runcycles/mcp-server` v0.6.1 (Node 20+ / `@modelcontextprotocol/sdk` / TypeScript 6) <!-- x-release-please-version -->
