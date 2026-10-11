@@ -1,5 +1,9 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-10-11 — Dependency maintenance
+
+Consolidates PRs #230, #231, #237, and #236: MCP SDK 1.32.1, TypeScript ESLint plugin 8.71.1, setup-node 7.1.0, and upload-artifact 7.0.2. Workflow actions remain pinned to commit SHAs. Server source and the YAML protocol contract are unchanged. Existing Node 20/22 lint, typecheck, build, and coverage gates remain enabled and must pass on the combined commit before merge.
+
 ## 2026-10-04 — Dependency maintenance
 
 Consolidates Dependabot PRs #226, #227, #224, and #223: MCP SDK 1.31.0, TypeScript ESLint parser 8.71.0, ESLint 10.11.0, and ip-address 10.7.2. Server source and YAML protocol contracts are unchanged. Existing Node 20/22 lint, typecheck, build, and test coverage checks (95% line minimum) must pass on the combined commit before merge. Vitest remains on version 4 to preserve Node 20 support; the isolated Vitest 5 PR #225 was declined. Local lint and tests pass with 97.18% line coverage, and local typecheck/build pass.
