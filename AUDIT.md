@@ -1,5 +1,18 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-10-19 — Dependabot dependency review
+
+Consolidates the following reviewed updates on current main:
+
+- PR #240: chore(deps): bump ossf/scorecard-action from 2.4.4 to 2.5.0
+- PR #241: chore(deps-dev): bump eslint from 10.11.0 to 10.12.0
+- PR #246: chore(deps): bump github/codeql-action/upload-sarif from 4.38.3 to 4.39.0
+
+Workflow actions remain pinned to verified upstream commit SHAs. Existing supported runtime versions, application code, and YAML protocol contracts are preserved. Existing lint, build, test, coverage, conformance, and applicable security checks must pass on the combined commit before merge; coverage requirements are not lowered.
+
+Declines Vitest 5 PR #243 and tsup 9 PR #242. Vitest 5 requires Node 22.12+ and tsup 9 requires Node 22.18+; this server retains Node 20 support. Vitest and its coverage provider remain aligned on version 4.
+
+
 ## 2026-10-11 — Dependency maintenance
 
 Consolidates PRs #230, #231, #237, and #236: MCP SDK 1.32.1, TypeScript ESLint plugin 8.71.1, setup-node 7.1.0, and upload-artifact 7.0.2. Workflow actions remain pinned to commit SHAs. Server source and the YAML protocol contract are unchanged. Existing Node 20/22 lint, typecheck, build, and coverage gates remain enabled and must pass on the combined commit before merge.
