@@ -1,5 +1,15 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-10-23 — Vite development-toolchain update
+
+Dependabot PR #248 updates transitive Vite 8.2.2 to 8.3.5 and its lockfile
+supporting dependencies, including Rolldown 1.2.14. Changes remain in the
+development toolchain; application source, published runtime dependencies,
+and YAML protocol behavior are unchanged. Existing Node 20/22 build, type,
+test, coverage, and applicable distribution checks must pass on the final
+commit. Coverage thresholds are preserved.
+
+
 ## 2026-10-19 — Dependabot dependency review
 
 Consolidates the following reviewed updates on current main:
