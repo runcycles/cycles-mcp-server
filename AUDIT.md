@@ -1,5 +1,14 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-11-01 — Dependabot TypeScript ESLint review
+
+PR #260 updates the locked @typescript-eslint/eslint-plugin from 8.71.1
+to 8.72.1 and aligns its supporting packages with the already updated parser.
+Current main is incorporated. The update changes development lint tooling;
+runtime source, public APIs, and authoritative YAML contracts are unchanged.
+Node 20/22 lint, typecheck, build, tests, and the existing 95% line coverage
+gate must pass on the final commit before merge.
+
 ## 2026-10-23 — Vite development-toolchain update
 
 Dependabot PR #248 updates transitive Vite 8.2.2 to 8.3.5 and its lockfile
