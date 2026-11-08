@@ -1,5 +1,11 @@
 # Cycles Protocol v0.1.24 — MCP Server Audit
 
+## 2026-11-08 - Dependabot dependency review
+
+PR #266 updates development ESLint to 10.14.0 and minimatch to 10.2.6 in the lockfile. Declines Vitest 5 / coverage-v8 5 PRs #265 and #267 because supported Node 20 is outside the Vitest 5 engine range.
+
+Current main is incorporated. Application source and authoritative YAML contracts are unchanged. Existing build, lint, typecheck, test, coverage, conformance, and security checks where configured must pass on the final commit before merge. The minimum 95% line coverage gate is preserved.
+
 ## 2026-11-01 — Dependabot TypeScript ESLint review
 
 PR #260 updates the locked @typescript-eslint/eslint-plugin from 8.71.1
